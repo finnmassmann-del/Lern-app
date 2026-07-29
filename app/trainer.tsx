@@ -3,7 +3,43 @@
 import { useState } from "react";
 import { randomTask, type Task } from "@/lib/tasks";
 
-type Result = { status: "richtig" | "fehler"; feedback: string };
+type Status = "richtig" | "fehler" | "hinweis";
+type Result = { status: Status; feedback: string };
+
+/**
+ * Farbliche Einordnung der Rückmeldung:
+ * grün = alles richtig, gelb = Fehler gefunden,
+ * blau = kein Rechenweg erkennbar (die KI soll dann nicht raten).
+ */
+const RESULT_STYLES: Record<
+  Status,
+  { box: string; head: string; body: string; button: string; icon: string; title: string }
+> = {
+  richtig: {
+    box: "border-emerald-300 bg-emerald-50",
+    head: "text-emerald-800",
+    body: "text-emerald-900",
+    button: "bg-emerald-700 hover:bg-emerald-600",
+    icon: "✓",
+    title: "Alles richtig",
+  },
+  fehler: {
+    box: "border-amber-300 bg-amber-50",
+    head: "text-amber-800",
+    body: "text-amber-900",
+    button: "bg-amber-700 hover:bg-amber-600",
+    icon: "!",
+    title: "Da ist ein Fehler",
+  },
+  hinweis: {
+    box: "border-sky-300 bg-sky-50",
+    head: "text-sky-800",
+    body: "text-sky-900",
+    button: "bg-sky-700 hover:bg-sky-600",
+    icon: "?",
+    title: "Rechenweg fehlt",
+  },
+};
 
 export default function Trainer({ initialTask }: { initialTask: Task }) {
   const [task, setTask] = useState<Task>(initialTask);
@@ -42,7 +78,8 @@ export default function Trainer({ initialTask }: { initialTask: Task }) {
     }
   }
 
-  const isCorrect = result?.status === "richtig";
+  // Unbekannter Status wird wie "Rechenweg fehlt" behandelt, nie als richtig.
+  const style = result ? (RESULT_STYLES[result.status] ?? RESULT_STYLES.hinweis) : null;
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 px-5 py-10 sm:py-16">
@@ -108,41 +145,21 @@ export default function Trainer({ initialTask }: { initialTask: Task }) {
         </section>
       )}
 
-      {result && (
-        <section
-          className={[
-            "rounded-2xl border p-5 shadow-sm",
-            isCorrect
-              ? "border-emerald-300 bg-emerald-50"
-              : "border-amber-300 bg-amber-50",
-          ].join(" ")}
-        >
+      {result && style && (
+        <section className={`rounded-2xl border p-5 shadow-sm ${style.box}`}>
           <h2
-            className={[
-              "flex items-center gap-2 text-sm font-semibold uppercase tracking-wider",
-              isCorrect ? "text-emerald-800" : "text-amber-800",
-            ].join(" ")}
+            className={`flex items-center gap-2 text-sm font-semibold uppercase tracking-wider ${style.head}`}
           >
-            <span aria-hidden="true">{isCorrect ? "✓" : "!"}</span>
-            {isCorrect ? "Alles richtig" : "Da ist ein Fehler"}
+            <span aria-hidden="true">{style.icon}</span>
+            {style.title}
           </h2>
-          <p
-            className={[
-              "mt-3 whitespace-pre-wrap text-[15px] leading-relaxed",
-              isCorrect ? "text-emerald-900" : "text-amber-900",
-            ].join(" ")}
-          >
+          <p className={`mt-3 whitespace-pre-wrap text-[15px] leading-relaxed ${style.body}`}>
             {result.feedback}
           </p>
           <button
             type="button"
             onClick={newTask}
-            className={[
-              "mt-4 rounded-xl px-4 py-2 text-sm font-semibold text-white transition",
-              isCorrect
-                ? "bg-emerald-700 hover:bg-emerald-600"
-                : "bg-amber-700 hover:bg-amber-600",
-            ].join(" ")}
+            className={`mt-4 rounded-xl px-4 py-2 text-sm font-semibold text-white transition ${style.button}`}
           >
             Neue Aufgabe
           </button>

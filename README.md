@@ -39,6 +39,24 @@ npm run dev
 
 Dann <http://localhost:3000> im Browser öffnen. Fertig.
 
+## Prüfen
+
+Zwei Skripte, damit die Fehlerdiagnose nachvollziehbar bleibt:
+
+```bash
+npm run pruefe:aufgaben   # Aufgabenliste + "Neue Aufgabe"-Logik (braucht keinen Key)
+npm run pruefe:api        # KI-Bewertung gegen feste Testfälle (Server + Key nötig)
+```
+
+`pruefe:api` erwartet einen laufenden Server (`npm run dev` in einem zweiten
+Terminal) und prüft 20 Fälle: alternative, aber korrekte Rechenwege dürfen nicht
+als Fehler gelten; echte Fehler müssen weiterhin auffallen; fehlender Rechenweg
+und Unsinn dürfen nicht geraten werden. Gegen eine deployte Version:
+
+```bash
+BASE_URL=https://meine-app.vercel.app npm run pruefe:api
+```
+
 ## Auf Vercel deployen
 
 **1. Code auf GitHub pushen** (falls noch nicht passiert):
@@ -76,6 +94,8 @@ Den Key setzt du dabei mit `vercel env add ANTHROPIC_API_KEY`.
 | `app/page.tsx` | Zieht beim Aufruf eine zufällige Aufgabe |
 | `app/trainer.tsx` | Oberfläche: Aufgabe, Eingabefeld, Ergebnisanzeige, „Neue Aufgabe“ |
 | `app/api/check/route.ts` | API-Route: ruft Claude mit dem Tutor-System-Prompt auf |
+| `scripts/pruefe-aufgaben.ts` | Prüft Aufgabenliste und „Neue Aufgabe“-Logik |
+| `scripts/pruefe-api.mjs` | Prüft die KI-Bewertung gegen feste Testfälle |
 
 Der Aufgaben-Pool lässt sich einfach in `lib/tasks.ts` erweitern — einfach weitere
 Einträge mit fortlaufender `id` ergänzen.
@@ -84,11 +104,18 @@ Einträge mit fortlaufender `id` ergänzen.
 
 - Der API-Key wird **ausschließlich serverseitig** in der API-Route verwendet und
   erreicht den Browser nie.
-- Der vorgegebene System-Prompt steht unverändert in `app/api/check/route.ts`.
-  Damit die App zuverlässig zwischen grün und gelb unterscheiden kann, wird die
-  Antwort per *Structured Output* (auf API-Ebene, nicht über den Prompt) in
-  `status` + `feedback` aufgeteilt.
-- Modell: `claude-opus-5`.
+- Der System-Prompt in `app/api/check/route.ts` sagt ausdrücklich, dass auf
+  **mathematische Korrektheit** geprüft wird und nicht auf Übereinstimmung mit
+  einem Standardweg. Ein größerer gemeinsamer Nenner, eine andere Reihenfolge
+  oder ein noch kürzbares Ergebnis sind kein Fehler.
+- Die Antwort wird per *Structured Output* (auf API-Ebene, nicht über den Prompt)
+  in `status` + `feedback` aufgeteilt. Drei Zustände:
+  `richtig` (grün), `fehler` (gelb) und `hinweis` (blau, wenn kein Rechenweg
+  erkennbar ist — dann wird nicht geraten).
+- Eingaben werden vor dem API-Aufruf geprüft: leer, zu lang (max. 4000 Zeichen)
+  oder unbekannte Aufgabe kosten keinen API-Aufruf.
+- Modell: `claude-opus-5`, `effort: high` (die Bewertung von Rechenwegen ist der
+  Teil, bei dem Genauigkeit zählt).
 
 Bewusst nicht enthalten: Login, Datenbank, Fortschrittsspeicherung, Gamification,
 Offline-Modus, andere Fächer, Handschrifterkennung.

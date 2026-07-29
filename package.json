@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "pruefe:aufgaben": "node --experimental-strip-types --disable-warning=ExperimentalWarning scripts/pruefe-aufgaben.ts",
+    "pruefe:api": "node scripts/pruefe-api.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.115.0",
