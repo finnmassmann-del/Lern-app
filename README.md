@@ -44,18 +44,25 @@ Dann <http://localhost:3000> im Browser öffnen. Fertig.
 Zwei Skripte, damit die Fehlerdiagnose nachvollziehbar bleibt:
 
 ```bash
-npm run pruefe:aufgaben   # Aufgabenliste + "Neue Aufgabe"-Logik (braucht keinen Key)
-npm run pruefe:api        # KI-Bewertung gegen feste Testfälle (Server + Key nötig)
+npm run pruefe:aufgaben     # Aufgabenliste + "Neue Aufgabe"-Logik (braucht keinen Key)
+npm run pruefe:api          # KI-Bewertung gegen feste Testfälle (Server + Key nötig)
+npm run vergleiche:modelle  # dieselben Fälle mit Opus 5 / Sonnet 5 / Haiku 4.5 (Key nötig)
 ```
 
 `pruefe:api` erwartet einen laufenden Server (`npm run dev` in einem zweiten
-Terminal) und prüft 20 Fälle: alternative, aber korrekte Rechenwege dürfen nicht
-als Fehler gelten; echte Fehler müssen weiterhin auffallen; fehlender Rechenweg
-und Unsinn dürfen nicht geraten werden. Gegen eine deployte Version:
+Terminal) und prüft 19 Fälle: 6 alternative, aber korrekte Rechenwege (dürfen
+nicht als Fehler gelten), 4 echte Fehler als Gegenprobe (müssen auffallen),
+5 Edge Cases (fehlender Rechenweg und Unsinn dürfen nicht geraten werden) und
+4 Fälle, die die Route ohne API-Aufruf abfängt. Gegen eine deployte Version:
 
 ```bash
 BASE_URL=https://meine-app.vercel.app npm run pruefe:api
 ```
+
+`vergleiche:modelle` braucht keinen Server und schickt die 15 KI-Fälle direkt an
+die API - je einmal pro Modell, mit identischem System-Prompt aus
+`lib/pruefung.ts`. Ausgabe: bestandene Fälle, Tokenverbrauch und Kosten pro
+Anfrage je Modell.
 
 ## Auf Vercel deployen
 
@@ -95,7 +102,10 @@ Den Key setzt du dabei mit `vercel env add ANTHROPIC_API_KEY`.
 | `app/trainer.tsx` | Oberfläche: Aufgabe, Eingabefeld, Ergebnisanzeige, „Neue Aufgabe“ |
 | `app/api/check/route.ts` | API-Route: ruft Claude mit dem Tutor-System-Prompt auf |
 | `scripts/pruefe-aufgaben.ts` | Prüft Aufgabenliste und „Neue Aufgabe“-Logik |
-| `scripts/pruefe-api.mjs` | Prüft die KI-Bewertung gegen feste Testfälle |
+| `lib/pruefung.ts` | System-Prompt + Antwortschema (von Route und Vergleich genutzt) |
+| `scripts/testfaelle.mjs` | Die Testfälle |
+| `scripts/pruefe-api.mjs` | Prüft die KI-Bewertung gegen die Testfälle |
+| `scripts/vergleiche-modelle.ts` | Dieselben Fälle mit drei Modellen, inkl. Kosten |
 
 Der Aufgaben-Pool lässt sich einfach in `lib/tasks.ts` erweitern — einfach weitere
 Einträge mit fortlaufender `id` ergänzen.
