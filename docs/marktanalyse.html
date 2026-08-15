@@ -1,0 +1,872 @@
+<title>Flohwerk</title>
+<style>
+  :root{
+    --paper:#F3F5F1;
+    --surface:#FCFCFA;
+    --surface-2:#EDF0EA;
+    --ink:#16211D;
+    --ink-soft:#4B5852;
+    --ink-faint:#7C8A83;
+    --rule:#D6DCD3;
+    --ledger:#1E5C48;
+    --ledger-2:#2C7D64;
+    --ledger-soft:#E2EDE7;
+    --oxblood:#8C2F26;
+    --oxblood-soft:#F4E3E0;
+    --amber:#9A6B12;
+    --amber-soft:#F5EBD6;
+    --shadow:0 1px 2px rgba(22,33,29,.06), 0 8px 24px rgba(22,33,29,.05);
+    --display:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    --body:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0E1614;
+      --surface:#141D1A;
+      --surface-2:#1A2521;
+      --ink:#E7EDE9;
+      --ink-soft:#A2B0A9;
+      --ink-faint:#76847D;
+      --rule:#28352F;
+      --ledger:#63C3A0;
+      --ledger-2:#7FD3B4;
+      --ledger-soft:#172E27;
+      --oxblood:#E8968A;
+      --oxblood-soft:#33201D;
+      --amber:#D8A94F;
+      --amber-soft:#2E2617;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0E1614;
+    --surface:#141D1A;
+    --surface-2:#1A2521;
+    --ink:#E7EDE9;
+    --ink-soft:#A2B0A9;
+    --ink-faint:#76847D;
+    --rule:#28352F;
+    --ledger:#63C3A0;
+    --ledger-2:#7FD3B4;
+    --ledger-soft:#172E27;
+    --oxblood:#E8968A;
+    --oxblood-soft:#33201D;
+    --amber:#D8A94F;
+    --amber-soft:#2E2617;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:17px;
+    line-height:1.62;
+    margin:0;
+    padding:0 20px 96px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
+  .wide{max-width:1180px;margin:0 auto}
+
+  /* Masthead */
+  .masthead{padding:56px 0 0;display:flex;flex-direction:column;gap:18px}
+  .kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ledger);margin:0}
+  h1{font-family:var(--display);font-weight:600;font-size:clamp(34px,6vw,52px);line-height:1.08;letter-spacing:-.015em;margin:0;text-wrap:balance}
+  .standfirst{font-size:19px;color:var(--ink-soft);margin:0;max-width:62ch}
+  .facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .fact{font-family:var(--mono);font-size:12px;padding:5px 10px;border:1px solid var(--rule);border-radius:2px;background:var(--surface);color:var(--ink-soft)}
+  .fact b{color:var(--ink);font-weight:600}
+
+  h2{font-family:var(--display);font-weight:600;font-size:clamp(25px,3.6vw,33px);line-height:1.16;letter-spacing:-.01em;margin:0 0 6px;text-wrap:balance}
+  h3{font-family:var(--display);font-weight:600;font-size:21px;line-height:1.25;margin:32px 0 6px;text-wrap:balance}
+  h4{font-family:var(--body);font-weight:650;font-size:15px;letter-spacing:.01em;margin:22px 0 4px}
+  p{margin:0 0 14px}
+  a{color:var(--ledger);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+  a:hover{text-decoration-thickness:2px}
+  a:focus-visible,summary:focus-visible{outline:2px solid var(--ledger);outline-offset:3px;border-radius:2px}
+  strong{font-weight:650}
+  ul,ol{margin:0 0 14px;padding-left:22px}
+  li{margin-bottom:5px}
+  li::marker{color:var(--ink-faint)}
+
+  section{display:flex;flex-direction:column}
+  .phase-head{display:flex;align-items:baseline;gap:12px;border-top:2px solid var(--ink);padding-top:12px;margin-bottom:14px;flex-wrap:wrap}
+  .phase-num{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ledger);white-space:nowrap}
+
+  .lede{font-size:18.5px;color:var(--ink-soft)}
+
+  /* Cards / callouts */
+  .note{background:var(--surface);border:1px solid var(--rule);border-radius:3px;padding:18px 20px;box-shadow:var(--shadow)}
+  .note.warn{background:var(--amber-soft);border-color:transparent}
+  .note.risk{background:var(--oxblood-soft);border-color:transparent}
+  .note.win{background:var(--ledger-soft);border-color:transparent}
+  .note h4{margin-top:0}
+  .note :last-child{margin-bottom:0}
+
+  .label{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);display:block;margin-bottom:3px}
+
+  /* Tables */
+  .scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--surface);box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+  thead th{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--ink-soft);background:var(--surface-2);white-space:nowrap;position:sticky;top:0;
+  }
+  tbody tr:last-child td{border-bottom:none}
+  td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px;white-space:nowrap}
+  tr.total td{font-weight:650;background:var(--surface-2)}
+  .rank{font-family:var(--mono);color:var(--ink-faint);font-size:13px}
+  .name{font-weight:600}
+
+  .score{display:inline-flex;align-items:center;gap:8px;justify-content:flex-end;width:100%}
+  .bar{height:6px;border-radius:99px;background:var(--ledger);opacity:.85;min-width:3px}
+  .bar.mid{background:var(--amber)}
+  .bar.low{background:var(--ink-faint)}
+
+  .flag{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:2px;white-space:nowrap;display:inline-block}
+  .flag.stop{background:var(--oxblood);color:var(--surface)}
+  .flag.care{background:var(--amber);color:var(--surface)}
+  .flag.go{background:var(--ledger);color:var(--surface)}
+
+  /* Idea blocks */
+  details{border:1px solid var(--rule);border-radius:3px;background:var(--surface);box-shadow:var(--shadow)}
+  details+details{margin-top:10px}
+  summary{cursor:pointer;padding:14px 18px;font-weight:650;font-size:16.5px;display:flex;gap:10px;align-items:baseline;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"›";font-family:var(--mono);color:var(--ledger);font-size:18px;transform:translateY(-1px);transition:transform .15s ease}
+  details[open] summary::before{transform:rotate(90deg) translateX(-1px)}
+  summary .pts{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink-faint);font-weight:400;white-space:nowrap}
+  .body{padding:0 18px 18px;border-top:1px solid var(--rule);margin-top:0}
+  .body dl{display:grid;grid-template-columns:minmax(150px,190px) 1fr;gap:0;margin:0}
+  .body dt{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);padding:9px 12px 9px 0;border-bottom:1px solid var(--rule)}
+  .body dd{margin:0;padding:9px 0;border-bottom:1px solid var(--rule);font-size:15px}
+  .body dl > :nth-last-child(-n+2){border-bottom:none}
+  @media (max-width:620px){
+    .body dl{grid-template-columns:1fr;gap:0}
+    .body dt{padding-bottom:0;border-bottom:none}
+    .body dd{padding-top:2px}
+    .body dl > :nth-last-child(-n+2){border-bottom:none}
+  }
+
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+
+  .toc{background:var(--surface);border:1px solid var(--rule);border-radius:3px;padding:16px 20px;box-shadow:var(--shadow)}
+  .toc ol{margin:0;padding-left:20px;columns:2;column-gap:28px}
+  @media (max-width:620px){.toc ol{columns:1}}
+  .toc li{margin-bottom:3px;font-size:15px}
+
+  .winner{background:var(--ledger);color:#F3F5F1;border-radius:4px;padding:28px 26px;display:flex;flex-direction:column;gap:10px}
+  .winner h2{color:#FFF;margin:0}
+  .winner .kicker{color:rgba(255,255,255,.72)}
+  .winner p{color:rgba(255,255,255,.9);margin:0}
+  .winner strong{color:#FFF}
+
+  hr{border:none;border-top:1px solid var(--rule);margin:0}
+  .foot{font-size:14px;color:var(--ink-faint)}
+  .src{font-size:14.5px}
+  .src li{margin-bottom:7px}
+  code{font-family:var(--mono);font-size:.88em;background:var(--surface-2);padding:1px 5px;border-radius:2px}
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">Marktlücken-Recherche · Stand 15. August 2026</p>
+  <h1>Flohwerk</h1>
+  <p class="standfirst">Zehn Phasen Recherche, 25 geprüfte Opportunities, ein Gewinner: eine leichte Warenwirtschaft für semi-professionelle Second-Hand-Händler in Deutschland — dort, wo JTL zu schwer und die KI-Listing-Tools zu leicht sind.</p>
+  <div class="facts">
+    <span class="fact">Budget <b>max. 2.000 €</b></span>
+    <span class="fact">Ziel <b>10.000 €+ / Monat</b></span>
+    <span class="fact">Gründer <b>13 Jahre</b></span>
+    <span class="fact">Markt <b>DACH</b></span>
+  </div>
+</header>
+
+<div class="toc">
+  <span class="label">Inhalt</span>
+  <ol>
+    <li><a href="#recht">Vorab: die rechtliche Realität</a></li>
+    <li><a href="#p1">Phase 1 — Marktmuster</a></li>
+    <li><a href="#p2">Phase 2 — 25 Opportunities</a></li>
+    <li><a href="#p3">Phase 3 — Top 10 im Detail</a></li>
+    <li><a href="#p4">Phase 4 — Budgetanalyse</a></li>
+    <li><a href="#p5">Phase 5 — Top 3</a></li>
+    <li><a href="#p6">Phase 6 — Harte Auswahl</a></li>
+    <li><a href="#p7">Phase 7 — Der Gewinner</a></li>
+    <li><a href="#p8">Phase 8 — 30-Tage-Plan</a></li>
+    <li><a href="#p9">Phase 9 — Tech-Stack</a></li>
+    <li><a href="#p10">Phase 10 — Marketing</a></li>
+    <li><a href="#quellen">Quellen &amp; Belege</a></li>
+  </ol>
+</div>
+
+<section id="recht">
+  <div class="phase-head"><span class="phase-num">Vorab</span><h2>Die rechtliche Realität mit 13 — bevor irgendetwas anderes zählt</h2></div>
+  <p>Das ist keine Bremse, sondern eine Checkliste. Sie muss stehen, bevor der erste Euro fließt — sonst blockiert sie dich genau in dem Moment, in dem es funktioniert.</p>
+  <div class="note warn">
+    <h4>Vier harte Punkte</h4>
+    <ul>
+      <li><strong>Gewerbe:</strong> Mit 13 bist du beschränkt geschäftsfähig. Ein eigenes Gewerbe braucht die Zustimmung deiner Eltern <em>und</em> die Genehmigung des Familiengerichts (§ 112 BGB) — das Gericht prüft die Reife im Einzelfall und genehmigt selten so früh.</li>
+      <li><strong>Praktische Lösung:</strong> Ein Elternteil meldet das Kleingewerbe an und ist formal Inhaber. Du bist operativ der Gründer. Das ist der übliche und saubere Weg — und er kostet nur die Gewerbeanmeldung (20–60 €).</li>
+      <li><strong>Konten:</strong> Stripe, Apple Developer Program (99 $/Jahr), Google Play (25 $ einmalig) und die meisten APIs verlangen Volljährigkeit. Alle laufen auf das Elternteil.</li>
+      <li><strong>Steuer:</strong> Kleinunternehmerregelung (§ 19 UStG) — keine Umsatzsteuer bis 25.000 € Vorjahresumsatz. Ab einem gewissen Punkt gehört ein Steuerberater dazu; bis dahin reicht eine saubere EÜR.</li>
+    </ul>
+  </div>
+  <p class="foot">Die gute Nachricht: Der empfohlene Gewinner braucht <em>kein</em> Telefonverkaufsgespräch mit einem 50-jährigen Handwerksmeister. Genau deshalb hat er gewonnen.</p>
+</section>
+
+<section id="p1">
+  <div class="phase-head"><span class="phase-num">Phase 1</span><h2>Was die Recherche über den Markt zeigt</h2></div>
+  <p class="lede">Ich habe App Stores, G2/Capterra, Trustpilot, Fach- und Nischenforen, Branchenblogs, Marktberichte und Community-Threads durchsucht. Zwölf Muster wiederholen sich so oft, dass sie die eigentliche Antwort sind.</p>
+
+  <h3>1. „Leere Märkte“ gibt es in Deutschland 2026 nicht mehr</h3>
+  <p>Jede Vertikale, die ich geprüft habe — Handwerk, Vereine, Hundeschulen, Pflege, Fahrschulen, Ferienwohnungen, Physiotherapie, Hausverwaltung — hat bereits Anbieter. Wer auf einen jungfräulichen Markt wartet, wartet ewig. Der Hebel liegt nicht in der Leere, sondern im <strong>Wedge</strong>: eine einzelne Aufgabe, die niemand gut löst.</p>
+
+  <h3>2. Die Solo- und Kleinstbetriebe sind systematisch unterversorgt</h3>
+  <p>Die Incumbents bauen für Betriebe ab ~5 Mitarbeitern und rufen 29–100 € <em>pro Nutzer</em> auf (ToolTime ab ca. 29 €/Nutzer, Plancraft ab ca. 59,90 €). Wiederkehrende Kritik in Tests: „Preis für Kleinbetriebe etwas zu hoch“. Der Ein-Personen-Betrieb fällt hinten runter — überall.</p>
+
+  <h3>3. Der De-facto-Stack ist WhatsApp + Excel + Zettel</h3>
+  <p>Dieses Muster tauchte in <em>jeder</em> Branche auf: „Fotos landen in WhatsApp-Gruppen, Notizen auf Klemmbrettern“ (Handwerk), „Mitgliederlisten in Excel, Terminabsprachen über drei WhatsApp-Gruppen“ (Vereine), „Termine per WhatsApp, Zehnerkarten auf Pappkärtchen“ (Hundeschulen), „Papierlisten, Excel-Tabellen und ein Sammelsurium aus Apps“ (Pflege).</p>
+
+  <h3>4. Regulatorik erzeugt Nachfrage mit Deadline</h3>
+  <p>2025–2028 ist dicht getaktet: E-Rechnungs-Empfangspflicht seit 1.1.2025, Sendepflicht ab 2027/2028 · BFSG seit 28.6.2025 mit ersten Abmahnungen im August 2025 · EU-AI-Act Art. 4: Marktüberwachung seit 2.8.2026 · Arbeitszeiterfassung · Führerscheinreform 2027 · DAC7-Meldungen. Angstgetriebene Käufe konvertieren gut — aber sie verlangen Autorität, die ein 13-Jähriger nicht glaubhaft aufbaut.</p>
+
+  <h3>5. KI hat den Engpass verschoben — von „bauen“ zu „verkaufen“</h3>
+  <p>Ein MVP, das 2021 noch 15.000 € gekostet hat, kostet heute ein Wochenende und 30 € API-Guthaben. Damit ist die Software nicht mehr der Burggraben. Die knappe Ressource ist Distribution. <strong>Jede Ideenbewertung muss also mit „wie kommt <em>dieser</em> Gründer an Kunden?“ beginnen, nicht mit „wie groß ist der Markt?“</strong></p>
+
+  <h3>6. KI schafft neue Probleme, nicht nur neue Werkzeuge</h3>
+  <p>Kunden fragen ChatGPT statt Google. Eine Untersuchung lokaler Betriebe fand: ChatGPT nennt nur etwa <strong>1–2 %</strong> der untersuchten Betriebe in seinen Antworten. Daraus ist innerhalb von 18 Monaten eine eigene Werkzeugkategorie (GEO) entstanden — mit Enterprise-Preisen (Profound ab 99 $, real 2.000–5.000 $/Monat; Peec AI 85–425 €/Monat).</p>
+
+  <h3>7. Überfüllte Märkte, die du meiden solltest</h3>
+  <p>KI-Listing-Generatoren aus Fotos (mindestens 8 Anbieter allein für Vinted/eBay), GEO-Tools (26+ Anbieter), Buchhaltung für Kleinunternehmer, Terminbuchung für Salons (Fresha ist kostenlos), Lern-Apps für Schüler, To-do- und Habit-Apps. In allen gilt: hohe Anbieterzahl, austauschbares Produkt, Preiskampf.</p>
+
+  <h3>8. Zahlungsbereitschaft folgt zurechenbarem Umsatz, nicht Marktgröße</h3>
+  <p>Der stärkste ROI-Beleg der ganzen Recherche: Bei Handwerksbetrieben bleiben rund <strong>35 % der eingehenden Anrufe unbeantwortet</strong>, und ein verlorener Auftrag kostet <strong>200–2.000 €</strong>. Deshalb funktionieren dort 99 €/Monat problemlos. Umgekehrt: Vereine haben riesige Verbreitung und zahlen fast nichts.</p>
+
+  <h3>9. Der Second-Hand-Markt wächst zweistellig <em>und</em> professionalisiert sich</h3>
+  <p>Deutschland 2026: geschätzt <strong>8,7 Mrd. €</strong> Marktvolumen, <strong>+22 %</strong> gegenüber Vorjahr. Kleinanzeigen hat 36 Mio. monatliche Nutzer, Vinted über 11 Mio. in Deutschland. Vinted Pro ist seit März 2025 in Deutschland offen und hat im Q1 2026 rund <strong>45.000 aktive Pro-Konten</strong> — Frankreich als reiferer Markt liegt bei über 200.000. Whatnot meldet, dass deutsche Verkäufer die erfolgreichsten Europas sind und 84 % 2026 weiter ausbauen wollen.</p>
+
+  <h3>10. Community-Kategorien lassen sich ohne Werbebudget erschließen</h3>
+  <p>Im Reseller-Software-Markt läuft die Kundengewinnung fast vollständig über Creator-Affiliates: Vendoo zahlt 15 % Provision für sechs Monate, betreibt ein Ambassador-Programm — und hat damit über <strong>20.000 Abonnenten</strong> aufgebaut, mit ca. <strong>250 Neukunden pro Monat</strong>. Das ist ein bewiesener Kanal, der null Vorabbudget braucht.</p>
+
+  <h3>11. Bürokratie ist das meistgenannte Problem — aber ein schlechter Einstieg</h3>
+  <p>Über 80 % der Unternehmen nennen Bürokratie als größtes Problem, junge Unternehmen verbringen ~9 Stunden pro Woche damit. Trotzdem: Alles, was in Richtung Steuer-, Rechts- oder Compliance-Beratung geht, ist für dich gesperrt (StBerG, RDG) und verlangt Autorität. Bürokratie ist ein Markt für Erwachsene mit Zulassung.</p>
+
+  <h3>12. Die Rechenaufgabe, an der die meisten scheitern</h3>
+  <p>Für 10.000 € Monatsumsatz brauchst du bei 9,99 € B2C-Abo rund <strong>1.000 zahlende</strong> Nutzer — bei üblicher Churn also 3.000–5.000 Neukunden pro Jahr. Bei 79 € B2B sind es <strong>127</strong>. Das ist der Grund, warum die Empfehlung im Prosumer-/B2B-Bereich liegt und nicht bei einer Schüler-App.</p>
+</section>
+
+<section id="p2">
+  <div class="phase-head"><span class="phase-num">Phase 2</span><h2>25 Opportunities, bewertet</h2></div>
+  <p>Bewertet nach 13 Kriterien, je 1–10. Bei <em>Konkurrenzniveau</em>, <em>MVP-Aufwand</em> und <em>MVP-Kosten</em> bedeutet 10 = günstig für dich (also wenig Konkurrenz, wenig Aufwand, wenig Kosten). <em>Marketing</em> misst nicht den Kanal an sich, sondern ob <strong>du</strong> ihn ohne Budget und ohne Erwachsenen-Autorität bedienen kannst. Maximum 130.</p>
+
+  <div class="scroll wide">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Problem</th><th>Zielgruppe</th><th>Lösung</th>
+          <th>Zahlungs&shy;bereitschaft</th><th>Konkurrenz</th><th>MVP-Aufwand</th><th class="num">MVP-Kosten</th><th>10K-Potenzial</th><th class="num">Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="rank">1</td><td class="name">Kein Überblick über Bestand, Gewinn und Gebühren beim Verkauf auf mehreren Plattformen</td><td>Semi-profi Second-Hand-Händler (DACH)</td><td>Leichte Warenwirtschaft: Bestand, Gewinn pro Artikel, Re-Listing, KI-Listings</td><td>Mittel–hoch (12–59 €)</td><td>Mittel</td><td>Mittel</td><td class="num">~450 €</td><td>Hoch</td><td class="num"><span class="score"><span class="bar" style="width:53px"></span>106</span></td></tr>
+        <tr><td class="rank">2</td><td class="name">Betrieb wird von ChatGPT &amp; Co. nicht empfohlen</td><td>Lokale KMU + kleine Agenturen</td><td>KI-Sichtbarkeits-Tracking mit konkreter Maßnahmenliste, White-Label</td><td>Hoch (49–199 €)</td><td>Hoch</td><td>Niedrig</td><td class="num">~300 €</td><td>Hoch</td><td class="num"><span class="score"><span class="bar" style="width:47px"></span>94</span></td></tr>
+        <tr><td class="rank">3</td><td class="name">Chaos bei Live-Verkäufen: Bestand, Bestellungen, Zahlen</td><td>Whatnot-/Live-Verkäufer DE</td><td>Cockpit für Live-Selling <span class="flag care">Teilmenge von #1</span></td><td>Hoch (49–99 €)</td><td>Niedrig</td><td>Mittel</td><td class="num">~400 €</td><td>Mittel</td><td class="num"><span class="score"><span class="bar" style="width:46px"></span>92</span></td></tr>
+        <tr><td class="rank">4</td><td class="name">35 % der Anrufe bleiben unbeantwortet, Aufträge gehen verloren</td><td>Handwerk, Praxen, Solo-Dienstleister</td><td>KI-Telefonassistent, nimmt an und qualifiziert</td><td>Sehr hoch (50–200 €)</td><td>Sehr hoch</td><td>Hoch</td><td class="num">~700 €</td><td>Sehr hoch</td><td class="num"><span class="score"><span class="bar" style="width:46px"></span>91</span></td></tr>
+        <tr><td class="rank">5</td><td class="name">Zu wenige Google-Bewertungen, keine Zeit zum Antworten</td><td>Lokale Betriebe</td><td>Bewertungs-Autopilot: QR/SMS-Anfragen + KI-Antworten</td><td>Mittel–hoch (39–79 €)</td><td>Hoch</td><td>Niedrig</td><td class="num">~300 €</td><td>Mittel–hoch</td><td class="num"><span class="score"><span class="bar" style="width:46px"></span>91</span></td></tr>
+        <tr><td class="rank">6</td><td class="name">Angebote werden nie nachgefasst, Kunde springt ab</td><td>Handwerk, Solo-Dienstleister</td><td>Automatisches Nachfassen + Lesebestätigung</td><td>Mittel (19–39 €)</td><td>Niedrig</td><td>Sehr niedrig</td><td class="num">~200 €</td><td>Mittel</td><td class="num"><span class="score"><span class="bar" style="width:45px"></span>90</span></td></tr>
+        <tr><td class="rank">7</td><td class="name">Anfragen, Angebote, Verträge und Anzahlungen laufen über Instagram-DMs</td><td>Hochzeits-/Event-Dienstleister DACH</td><td>Schlankes CRM mit DSGVO, SEPA, E-Signatur</td><td>Mittel–hoch (29–59 €)</td><td>Mittel</td><td>Mittel</td><td class="num">~400 €</td><td>Mittel</td><td class="num"><span class="score"><span class="bar" style="width:44px"></span>88</span></td></tr>
+        <tr><td class="rank">8</td><td class="name">Kursanmeldung per WhatsApp, Zehnerkarten auf Pappe</td><td>Hundeschulen, Yoga, Musik, Tanz</td><td>Kurs- und Terminverwaltung mit Selbstbuchung</td><td>Mittel (19–49 €)</td><td>Hoch</td><td>Mittel</td><td class="num">~350 €</td><td>Mittel</td><td class="num"><span class="score"><span class="bar mid" style="width:44px"></span>87</span></td></tr>
+        <tr><td class="rank">9</td><td class="name">Keine Bewerber, Agenturen kosten 1.000–3.000 €/Monat</td><td>Kleine Handwerksbetriebe</td><td>Self-Service-Recruiting-Funnel ohne Lebenslauf</td><td>Hoch (99–199 €)</td><td>Mittel</td><td>Mittel</td><td class="num">~450 €</td><td>Hoch</td><td class="num"><span class="score"><span class="bar mid" style="width:43px"></span>85</span></td></tr>
+        <tr><td class="rank">10</td><td class="name">Stundenzettel auf Papier, Nachweis fehlt</td><td>Betriebe unter 10 Mitarbeitern</td><td>Minimalistische Zeiterfassung</td><td>Mittel (5–9 €/MA)</td><td>Sehr hoch</td><td>Niedrig</td><td class="num">~300 €</td><td>Mittel</td><td class="num"><span class="score"><span class="bar mid" style="width:43px"></span>85</span></td></tr>
+        <tr><td class="rank">11</td><td class="name">50 % der Nebenkostenabrechnungen sind fehlerhaft</td><td>Mieter</td><td>KI-Prüfung der Abrechnung <span class="flag stop">RDG-Risiko</span></td><td>Mittel (10–40 € einmalig)</td><td>Hoch</td><td>Niedrig</td><td class="num">~300 €</td><td>Mittel</td><td class="num"><span class="score"><span class="bar mid" style="width:41px"></span>82</span></td></tr>
+        <tr><td class="rank">12</td><td class="name">XRechnungen kommen an und niemand kann sie lesen/archivieren</td><td>Kleinstunternehmer, Freiberufler</td><td>E-Rechnungs-Postfach + GoBD-Archiv</td><td>Niedrig (5–15 €)</td><td>Sehr hoch</td><td>Niedrig</td><td class="num">~250 €</td><td>Niedrig–mittel</td><td class="num"><span class="score"><span class="bar mid" style="width:41px"></span>82</span></td></tr>
+        <tr><td class="rank">13</td><td class="name">Shop nicht barrierefrei, Abmahnungen laufen bereits</td><td>Onlineshops ab 10 Mitarbeitern</td><td>BFSG-Scan + Monitoring <span class="flag care">Autorität nötig</span></td><td>Hoch (49–149 €)</td><td>Mittel</td><td>Mittel</td><td class="num">~350 €</td><td>Mittel</td><td class="num"><span class="score"><span class="bar mid" style="width:41px"></span>81</span></td></tr>
+        <tr><td class="rank">14</td><td class="name">Registrierkassenpflicht ab 2027, TSE fehlt</td><td>Imbisse, Marktstände, Kioske</td><td>Zertifiziertes Kassensystem <span class="flag stop">Zu teuer fürs Startbudget</span></td><td>Sehr hoch</td><td>Mittel</td><td>Sehr hoch</td><td class="num">&gt;25.000 €</td><td>Sehr hoch</td><td class="num"><span class="score"><span class="bar low" style="width:40px"></span>80</span></td></tr>
+        <tr><td class="rank">15</td><td class="name">Stundenpläne, Lehrer und Abrechnung in Excel</td><td>Kleine Nachhilfeinstitute</td><td>Institutsverwaltung</td><td>Mittel (49–99 €)</td><td>Mittel</td><td>Mittel</td><td class="num">~350 €</td><td>Niedrig</td><td class="num"><span class="score"><span class="bar low" style="width:40px"></span>80</span></td></tr>
+        <tr><td class="rank">16</td><td class="name">Beitragseinzug, Mahnungen und Mitgliederdaten per Hand</td><td>Vereinsvorstände</td><td>Kassenwart-Tool mit SEPA</td><td>Sehr niedrig</td><td>Sehr hoch</td><td>Mittel</td><td class="num">~350 €</td><td>Niedrig</td><td class="num"><span class="score"><span class="bar low" style="width:40px"></span>79</span></td></tr>
+        <tr><td class="rank">17</td><td class="name">Brand Deals, Nutzungsrechte und Rechnungen in Google Sheets</td><td>UGC-Creator</td><td>Deal- und Rechnungs-Tracker</td><td>Niedrig</td><td>Sehr hoch</td><td>Niedrig</td><td class="num">~250 €</td><td>Niedrig</td><td class="num"><span class="score"><span class="bar low" style="width:40px"></span>79</span></td></tr>
+        <tr><td class="rank">18</td><td class="name">Zeugnisse und Förderpläne kosten Wochenenden</td><td>Lehrkräfte, v. a. Grundschule</td><td>Formulierungs- und Förderplan-Assistent</td><td>Niedrig (privat) </td><td>Hoch (fobizz)</td><td>Niedrig</td><td class="num">~250 €</td><td>Niedrig</td><td class="num"><span class="score"><span class="bar low" style="width:39px"></span>78</span></td></tr>
+        <tr><td class="rank">19</td><td class="name">Absetzungen durch Krankenkassen wegen fehlerhafter Rezepte</td><td>Physio-, Ergo-, Logopädie-Praxen</td><td>Rezeptprüfung <span class="flag care">Zulassung/Fachwissen</span></td><td>Hoch</td><td>Mittel</td><td>Sehr hoch</td><td class="num">~1.500 €</td><td>Mittel</td><td class="num"><span class="score"><span class="bar low" style="width:39px"></span>77</span></td></tr>
+        <tr><td class="rank">20</td><td class="name">KI-Kompetenz-Nachweis nach EU-AI-Act Art. 4</td><td>KMU, die KI einsetzen</td><td>Online-Schulung + Nachweis <span class="flag care">Autorität nötig</span></td><td>Mittel (149–499 € einmalig)</td><td>Hoch</td><td>Niedrig</td><td class="num">~300 €</td><td>Mittel</td><td class="num"><span class="score"><span class="bar low" style="width:38px"></span>75</span></td></tr>
+        <tr><td class="rank">21</td><td class="name">Meldescheine und Kurtaxe von Hand</td><td>Ferienwohnungsvermieter</td><td>Digitaler Check-in + Kurtaxe-Abrechnung</td><td>Mittel (19–39 €)</td><td>Mittel</td><td>Mittel</td><td class="num">~400 €</td><td>Niedrig–mittel</td><td class="num"><span class="score"><span class="bar low" style="width:38px"></span>75</span></td></tr>
+        <tr><td class="rank">22</td><td class="name">Fördermittel werden nicht abgerufen, weil niemand sie findet</td><td>KMU, Vereine</td><td>Fördermittel-Matching</td><td>Mittel</td><td>Mittel</td><td>Mittel</td><td class="num">~400 €</td><td>Mittel</td><td class="num"><span class="score"><span class="bar low" style="width:37px"></span>74</span></td></tr>
+        <tr><td class="rank">23</td><td class="name">Führerscheinreform 2027 zwingt zu neuer Software</td><td>Fahrschulen</td><td>Verwaltung + native Theorie-Plattform</td><td>Hoch</td><td>Mittel</td><td>Sehr hoch</td><td class="num">&gt;10.000 €</td><td>Mittel</td><td class="num"><span class="score"><span class="bar low" style="width:37px"></span>73</span></td></tr>
+        <tr><td class="rank">24</td><td class="name">Pflegegrad-Antrag und Widerspruch überfordern Angehörige</td><td>Pflegende Angehörige</td><td>Antrags-Assistent <span class="flag stop">RDG-Risiko, sensibel</span></td><td>Mittel</td><td>Mittel</td><td>Mittel</td><td class="num">~400 €</td><td>Niedrig</td><td class="num"><span class="score"><span class="bar low" style="width:37px"></span>73</span></td></tr>
+        <tr><td class="rank">25</td><td class="name">Tourenplanung und Dokumentation von Hand</td><td>Kleine Pflege-/Betreuungsdienste</td><td>Touren- und Dienstplanung <span class="flag stop">Zu komplex/teuer</span></td><td>Hoch</td><td>Mittel</td><td>Sehr hoch</td><td class="num">&gt;5.000 €</td><td>Mittel</td><td class="num"><span class="score"><span class="bar low" style="width:37px"></span>73</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Die Detailbewertung nach allen 13 Kriterien</h3>
+  <p class="foot">S = Schmerz · MG = Marktgröße · ZB = Zahlungsbereitschaft · HF = Häufigkeit · KN = Konkurrenzniveau · DIF = Differenzierung · TM = techn. Machbarkeit · AUF = MVP-Aufwand · KOS = MVP-Kosten · RET = Retention · MKT = Marketing durch dich · SKA = Skalierbarkeit · 10K = 10K-Potenzial</p>
+  <div class="scroll wide">
+    <table>
+      <thead><tr><th>#</th><th>Idee</th><th class="num">S</th><th class="num">MG</th><th class="num">ZB</th><th class="num">HF</th><th class="num">KN</th><th class="num">DIF</th><th class="num">TM</th><th class="num">AUF</th><th class="num">KOS</th><th class="num">RET</th><th class="num">MKT</th><th class="num">SKA</th><th class="num">10K</th><th class="num">Σ</th></tr></thead>
+      <tbody>
+        <tr><td class="rank">1</td><td class="name">Second-Hand-Cockpit</td><td class="num">8</td><td class="num">8</td><td class="num">7</td><td class="num">10</td><td class="num">6</td><td class="num">8</td><td class="num">8</td><td class="num">8</td><td class="num">9</td><td class="num">7</td><td class="num">10</td><td class="num">9</td><td class="num">8</td><td class="num"><strong>106</strong></td></tr>
+        <tr><td class="rank">2</td><td class="name">Lokale KI-Sichtbarkeit</td><td class="num">6</td><td class="num">8</td><td class="num">8</td><td class="num">8</td><td class="num">4</td><td class="num">5</td><td class="num">9</td><td class="num">8</td><td class="num">9</td><td class="num">6</td><td class="num">6</td><td class="num">9</td><td class="num">8</td><td class="num"><strong>94</strong></td></tr>
+        <tr><td class="rank">3</td><td class="name">Live-Selling-Cockpit</td><td class="num">8</td><td class="num">5</td><td class="num">8</td><td class="num">9</td><td class="num">7</td><td class="num">7</td><td class="num">6</td><td class="num">6</td><td class="num">8</td><td class="num">7</td><td class="num">8</td><td class="num">7</td><td class="num">6</td><td class="num"><strong>92</strong></td></tr>
+        <tr><td class="rank">4</td><td class="name">KI-Telefonassistent</td><td class="num">10</td><td class="num">9</td><td class="num">9</td><td class="num">9</td><td class="num">4</td><td class="num">5</td><td class="num">6</td><td class="num">5</td><td class="num">6</td><td class="num">8</td><td class="num">4</td><td class="num">7</td><td class="num">9</td><td class="num"><strong>91</strong></td></tr>
+        <tr><td class="rank">5</td><td class="name">Bewertungs-Autopilot</td><td class="num">7</td><td class="num">8</td><td class="num">7</td><td class="num">8</td><td class="num">4</td><td class="num">4</td><td class="num">9</td><td class="num">8</td><td class="num">9</td><td class="num">7</td><td class="num">5</td><td class="num">8</td><td class="num">7</td><td class="num"><strong>91</strong></td></tr>
+        <tr><td class="rank">6</td><td class="name">Angebots-Nachfassen</td><td class="num">7</td><td class="num">7</td><td class="num">5</td><td class="num">8</td><td class="num">7</td><td class="num">5</td><td class="num">9</td><td class="num">9</td><td class="num">9</td><td class="num">6</td><td class="num">4</td><td class="num">8</td><td class="num">6</td><td class="num"><strong>90</strong></td></tr>
+        <tr><td class="rank">7</td><td class="name">Hochzeits-/Event-CRM</td><td class="num">8</td><td class="num">5</td><td class="num">7</td><td class="num">7</td><td class="num">6</td><td class="num">6</td><td class="num">7</td><td class="num">6</td><td class="num">8</td><td class="num">8</td><td class="num">7</td><td class="num">7</td><td class="num">6</td><td class="num"><strong>88</strong></td></tr>
+        <tr><td class="rank">8</td><td class="name">Kursverwaltung Solo</td><td class="num">8</td><td class="num">6</td><td class="num">7</td><td class="num">9</td><td class="num">4</td><td class="num">4</td><td class="num">8</td><td class="num">6</td><td class="num">8</td><td class="num">9</td><td class="num">5</td><td class="num">7</td><td class="num">6</td><td class="num"><strong>87</strong></td></tr>
+        <tr><td class="rank">9</td><td class="name">Recruiting-Funnel</td><td class="num">9</td><td class="num">8</td><td class="num">8</td><td class="num">6</td><td class="num">5</td><td class="num">5</td><td class="num">7</td><td class="num">6</td><td class="num">7</td><td class="num">6</td><td class="num">4</td><td class="num">7</td><td class="num">7</td><td class="num"><strong>85</strong></td></tr>
+        <tr><td class="rank">10</td><td class="name">Zeiterfassung klein</td><td class="num">6</td><td class="num">8</td><td class="num">6</td><td class="num">10</td><td class="num">2</td><td class="num">3</td><td class="num">8</td><td class="num">7</td><td class="num">8</td><td class="num">9</td><td class="num">4</td><td class="num">8</td><td class="num">6</td><td class="num"><strong>85</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="p3">
+  <div class="phase-head"><span class="phase-num">Phase 3</span><h2>Die Top 10 im Detail</h2></div>
+  <p>Jede Idee entlang derselben 24 Fragen. Aufklappen zum Lesen.</p>
+
+  <details open>
+    <summary>1 · Flohwerk — Warenwirtschaft für Second-Hand-Profis <span class="pts">106 / 130</span></summary>
+    <div class="body"><dl>
+      <dt>1 Problem</dt><dd>Wer auf Kleinanzeigen, Vinted, eBay und Whatnot gleichzeitig verkauft, weiß nicht mehr, welcher Artikel wo online ist, was schon verkauft wurde und was tatsächlich verdient wurde. Einkaufspreis, Plattformgebühren, Versand und Retouren stehen in keiner gemeinsamen Zeile. Anzeigen laufen ab und werden vergessen. Am Jahresende fehlt die Basis für die Steuer.</dd>
+      <dt>2 Zielgruppe</dt><dd>Semi-professionelle und gewerbliche Second-Hand-Verkäufer in DACH: 50–2.000 Artikel Bestand, 500–10.000 € Umsatz im Monat. Kleiderkreisel-Profis, Sneaker- und Trading-Card-Händler, Vintage-Shops, Haushaltsauflöser, Whatnot-Streamer, Vinted-Pro-Konten.</dd>
+      <dt>3 Problemstärke</dt><dd>Täglich, nicht monatlich. Ein Verkäufer mit 300 Artikeln verliert 30–60 Minuten pro Tag an Suchen, Nachtragen und Doppelverkäufen — und weiß trotzdem nicht, ob er Gewinn macht. Der teuerste Einzelfehler: fehlende Einkaufsbelege, weil dann im Zweifel der volle Umsatz als Gewinn gilt.</dd>
+      <dt>4 Bestehende Lösungen</dt><dd>Drei Lager. (a) KI-Listing-Generatoren: Listed AI, Snap2List, Photo to Listing, Vintefy, Vinting, AutoLister, FlowLister. (b) Crosslisting: Vendoo, List Perfectly, Crosslist, Relistly. (c) Echte Warenwirtschaft: JTL-Wawi, Afterbuy, plentymarkets, Billbee.</dd>
+      <dt>5 Schwächen der Konkurrenz</dt><dd>Lager (a) ist ein Feature, keine Firma — es erzeugt Text und vergisst dich danach. Lager (b) ist auf US-Plattformen zugeschnitten: Crosslist schließt EU-Bewohner aus, List Perfectly unterstützt offiziell nur US-Marktplätze; Kleinanzeigen — Deutschlands größte Plattform mit 36 Mio. Nutzern — spielt bei kaum einem eine Rolle. Lager (c) ist ERP für Neuware: JTL läuft nur auf Windows-Servern, die Einrichtung ist komplex, und Vinted, Kleinanzeigen und Whatnot sind gar nicht angebunden. Zwischen „zu leicht“ und „zu schwer“ liegt nichts.</dd>
+      <dt>6 Beweise</dt><dd>Second-Hand DE 2026: 8,7 Mrd. €, +22 %. Kleinanzeigen 36 Mio. monatliche Nutzer, Vinted &gt;11 Mio. in DE. Vinted Pro DE: ~45.000 aktive Pro-Konten in Q1 2026 nach Launch im März 2025 (Frankreich: &gt;200.000 — das ist die Wachstumskurve, die Deutschland noch vor sich hat). Vendoo: &gt;20.000 Abonnenten, +250/Monat, 15 % Affiliate-Provision. In der Kleinanzeigen-Community existiert ein eigener Thread, in dem Nutzer genau diese Verbindung aus eBay, Kleinanzeigen und Vinted einfordern. Whatnot: deutsche Verkäufer sind die erfolgreichsten Europas, 84 % wollen 2026 ausbauen.</dd>
+      <dt>7 Meine Lösung</dt><dd>Ein Artikel wird einmal angelegt — Fotos rein, KI erzeugt Titel, Beschreibung, Kategorie und Preisvorschlag. Der Artikel bekommt einen Status je Plattform (Entwurf / online / verkauft / zurück). Jeder Verkauf wird mit Einkaufspreis, Gebühren und Versand verrechnet, sodass der echte Gewinn pro Artikel sichtbar ist. Dazu Erinnerungen, wenn eine Kleinanzeige ausläuft, und ein laufender Zähler für die DAC7-Schwellen (30 Verkäufe / 2.000 € je Plattform).</dd>
+      <dt>8 Killer Feature</dt><dd><strong>Gewinn pro Artikel, plattformübergreifend.</strong> Kein einziges der Listing-Tools kann das, und es ist die Zahl, nach der jeder Verkäufer sucht. Sie beantwortet „lohnt sich das überhaupt?“ — und sobald die eigenen Zahlen im System liegen, wechselt niemand mehr.</dd>
+      <dt>9 Weitere Features</dt><dd>Preisrecherche über tatsächlich verkaufte Vergleichsartikel · Foto-Aufbereitung (Hintergrund, Zuschnitt) · Bestandsliste mit Lagerort (Kiste 4, Regal B) · Ladenhüter-Report („seit 90 Tagen online, Preis senken?“) · Versandkosten-Rechner je Paketgröße · Wiedereinstellen mit einem Klick · CSV-Export für die EÜR · Sammel-Import bestehender Verkäufe · Einkaufserfassung mit Belegfoto · Team-Zugang für Familienbetriebe.</dd>
+      <dt>10 Monetarisierung</dt><dd>Abo, monatlich oder jährlich. Kein Prozentsatz vom Umsatz — das kollidiert mit den Plattformen und schreckt ab.</dd>
+      <dt>11 Pricing</dt><dd>Kostenlos bis 25 aktive Artikel · Solo 12,99 € · Pro 29 € · Händler 59 € (mehrere Nutzer, unbegrenzte Artikel). Jahreszahlung mit zwei Freimonaten.</dd>
+      <dt>12 Free vs. Premium</dt><dd>Kostenlos: bis 25 Artikel, Bestandsliste, Gewinnrechnung, 10 KI-Listings/Monat. Premium: unbegrenzter Bestand, unbegrenzte KI-Listings, Ladenhüter-Report, Preisrecherche, Exporte, Erinnerungen, Team.</dd>
+      <dt>13 Retention</dt><dd>Tag 30: der Bestand liegt drin, die Alternative wäre Excel. Tag 90: die Gewinnhistorie ist die einzige Quelle für die Steuer. Tag 365: ein Jahr Zahlen, die nirgendwo sonst existieren. Das ist echte Wechselhürde, keine Gewohnheit.</dd>
+      <dt>14 Wettbewerbsvorteil</dt><dd>Deutsch zuerst, Kleinanzeigen zuerst, Gewinn zuerst. Die internationalen Anbieter behandeln den DACH-Markt als Nachtrag und die Buchhaltung gar nicht.</dd>
+      <dt>15 MVP</dt><dd>Artikel anlegen mit Fotos · KI-Text und Preisvorschlag · Status je Plattform manuell setzen · Verkauf erfassen mit Gebühren und Versand · Gewinn pro Artikel und pro Monat · CSV-Export. Mehr nicht. Kein Crossposting in Version 1.</dd>
+      <dt>16 Technik</dt><dd>Next.js auf Vercel, Supabase für Datenbank, Auth und Bildspeicher, Stripe für Abos, Claude-API für Bild- zu Listing-Erzeugung. Später eine Browser-Erweiterung, die Formulare <em>vorausfüllt</em> und den Nutzer klicken lässt, sowie die offizielle eBay-Sell-API.</dd>
+      <dt>17 KI-Unterstützung</dt><dd>Claude für Titel, Beschreibung, Kategorie und Zustandstext direkt aus den Fotos (Structured Outputs, wie du sie im Bruchrechen-Projekt schon nutzt). Claude Code für die Entwicklung selbst. KI-Bilderkennung zum Auslesen von Marke und Größe aus Etiketten.</dd>
+      <dt>18 MVP-Kosten</dt><dd>Rund 450 € inklusive Domain, ersten API-Kosten, Stripe-Testphase und einem kleinen Budget für Nutzer-Interviews. Details in Phase 4.</dd>
+      <dt>19 Laufende Kosten</dt><dd>Bei 100 zahlenden Kunden etwa 60–110 €/Monat: Vercel 20 €, Supabase 25 €, Claude-API 20–50 €, Domain und Mailversand ~10 €. Stripe nimmt 1,5 % + 0,25 € je Zahlung.</dd>
+      <dt>20 Erste 100 Nutzer</dt><dd>Selbst verkaufen und den Aufbau auf TikTok und YouTube dokumentieren · deutsche Reselling-Discords und Facebook-Gruppen · die Kleinanzeigen-Community, wo genau danach gefragt wird · drei bis fünf Reseller-Creator mit kostenlosem Zugang plus Affiliate.</dd>
+      <dt>21 Skalierung</dt><dd>1.000: Affiliate-Programm mit 20 % wiederkehrend, SEO auf „Vinted Gebühren“, „Gewinn berechnen“, „Kleinanzeigen Anzeige wiedereinstellen“. 10.000: Österreich und Schweiz, dann Niederlande und Frankreich — Vinted ist überall dieselbe Plattform. 100.000: Anbindung an Steuerberater-Exporte (DATEV), Marktplatz-Partnerschaften.</dd>
+      <dt>22 Risiken</dt><dd>Plattformabhängigkeit — Kleinanzeigen untersagt aggressive Bots und sperrt automatisiert; ein Crossposting-Feature kann Nutzerkonten gefährden. Churn, wenn Leute das Verkaufen aufgeben. Und die Listing-Tools könnten nach unten in die Warenwirtschaft wachsen.</dd>
+      <dt>23 Gegenargumente</dt><dd>„Excel reicht doch.“ — Stimmt bis etwa 100 Artikel; darüber nicht mehr, und genau da liegt die Zielgruppe. „Der Markt ist voll.“ — Voll mit Text-Generatoren, leer bei Bestand und Gewinn im DACH-Raum. „Zu wenig ARPU.“ — Berechtigt: bei 24 € Durchschnitt brauchst du ~417 Zahler für 10.000 €. Deshalb muss der Händler-Tarif von Anfang an existieren. „Vinted könnte das selbst bauen.“ — Möglich, aber Vinted hat kein Interesse daran, Verkäufe auf Kleinanzeigen und eBay mitzuzählen. Das ist der strukturelle Schutz.</dd>
+      <dt>24 Validierung in 7–14 Tagen</dt><dd>Landingpage mit den drei Tarifen und einem echten „Jetzt starten“-Button, der zu einer Warteliste mit Vorbestellungsoption führt (50 % Rabatt lebenslang, 19 € Vorauszahlung). 20 Verkäufer in Discords und Gruppen direkt anschreiben und nach ihrer aktuellen Excel fragen. Erfolgskriterium: <strong>10 zahlende Vorbestellungen oder 100 Wartelisten-Eintragungen in 14 Tagen.</strong></dd>
+    </dl></div>
+  </details>
+
+  <details>
+    <summary>2 · Lokale KI-Sichtbarkeit für KMU und Agenturen <span class="pts">94 / 130</span></summary>
+    <div class="body"><dl>
+      <dt>1 Problem</dt><dd>Kunden fragen ChatGPT statt Google. Lokale Betriebe tauchen dort praktisch nicht auf und merken es nicht.</dd>
+      <dt>2 Zielgruppe</dt><dd>Lokale Dienstleister mit Online-Nachfrage (Zahnärzte, Anwälte, Sanitär, Umzug) und kleine Web-Agenturen, die 5–50 solcher Kunden betreuen.</dd>
+      <dt>3 Problemstärke</dt><dd>Noch mittel. Der Schmerz ist real, aber selten bewusst — er wird erst zum Notfall, wenn Anfragen ausbleiben.</dd>
+      <dt>4 Bestehende Lösungen</dt><dd>Profound, Peec AI, Otterly, Evertune, Ahrefs Brand Radar, dazu SEO-Agenturen ab 500 €/Monat und Pakete wie regionalflat ab 299 €/Monat.</dd>
+      <dt>5 Schwächen</dt><dd>Alle bauen für Marketing-Teams großer Marken, nicht für einen Malerbetrieb: Preise ab 85–425 €/Monat, englische Oberfläche, Ergebnisse ohne konkrete Handlungsanweisung. Für lokale Suchintention („Zahnarzt in Kassel“) ist kaum etwas gemacht.</dd>
+      <dt>6 Beweise</dt><dd>ChatGPT nennt nur ca. 1–2 % der untersuchten lokalen Betriebe. Profound veröffentlicht keine Preise mehr und verweist auf Demo-Termine — ein klares Zeichen für Enterprise-Fokus.</dd>
+      <dt>7 Meine Lösung</dt><dd>30 typische Kundenfragen für Branche und Ort, monatlich gegen mehrere KI-Modelle geprüft. Ergebnis: Werde ich genannt, an welcher Stelle, wer stattdessen — plus fünf konkrete Aufgaben für diesen Monat.</dd>
+      <dt>8 Killer Feature</dt><dd>Der kostenlose Sofort-Check: Betrieb eingeben, 60 Sekunden warten, PDF mit „Sie werden bei 2 von 30 Fragen genannt, Ihre drei Wettbewerber bei 18“.</dd>
+      <dt>9 Weitere Features</dt><dd>Wettbewerbsvergleich · Verlaufskurve · Quellen-Analyse (welche Seiten zitiert die KI) · Google-Unternehmensprofil-Prüfung · Branchenbuch-Checkliste · Textvorschläge für zitierfähige Leistungsseiten · White-Label-PDF · Mehrmandanten-Ansicht · monatlicher Report per Mail.</dd>
+      <dt>10 Monetarisierung</dt><dd>Abo, zwei Zielgruppen: Betrieb direkt und Agentur mit Mandanten-Kontingent.</dd>
+      <dt>11 Pricing</dt><dd>Betrieb 49 €/Monat · Agentur 149 € (10 Mandanten) · 299 € (30 Mandanten).</dd>
+      <dt>12 Free vs. Premium</dt><dd>Frei: einmaliger Check, 10 Fragen. Premium: monatliches Tracking, Wettbewerber, Verlauf, Maßnahmen, White-Label.</dd>
+      <dt>13 Retention</dt><dd>Der Verlauf ist das Produkt — ein einzelner Messpunkt ist wertlos. Risiko: Kündigung, sobald der Wert „gut genug“ aussieht.</dd>
+      <dt>14 Wettbewerbsvorteil</dt><dd>Deutsch, lokal, mit Maßnahmen statt Kennzahlen, zu einem Fünftel des Agenturpreises.</dd>
+      <dt>15 MVP</dt><dd>Fragenerzeugung aus Branche und Ort, Abfrage gegen zwei Modelle, Nennungserkennung, PDF-Report, wöchentlicher Cron.</dd>
+      <dt>16 Technik</dt><dd>Next.js, Supabase, Vercel Cron, Claude- und OpenAI-APIs, PDF-Erzeugung serverseitig.</dd>
+      <dt>17 KI-Unterstützung</dt><dd>Die Modelle sind gleichzeitig Messobjekt und Werkzeug: sie erzeugen die Fragen, beantworten sie und formulieren die Maßnahmen.</dd>
+      <dt>18 MVP-Kosten</dt><dd>~300 €.</dd>
+      <dt>19 Laufende Kosten</dt><dd>API-Kosten skalieren mit Mandanten: ~0,60–1,50 € pro Betrieb und Monat, plus 45 € Infrastruktur.</dd>
+      <dt>20 Erste 100 Nutzer</dt><dd>Kostenlose Checks für 200 Betriebe erzeugen und per Mail zuschicken. Das ist Kaltakquise per E-Mail — machbar, aber mit 13 mühsam.</dd>
+      <dt>21 Skalierung</dt><dd>Über Agenturen, nicht über Einzelbetriebe. Eine Agentur bringt 10–30 Mandanten auf einmal.</dd>
+      <dt>22 Risiken</dt><dd>Wirkungsnachweis. Wenn die Maßnahmen die Nennungen nicht messbar erhöhen, kündigt der Kunde nach drei Monaten.</dd>
+      <dt>23 Gegenargumente</dt><dd>Der Markt hat 26+ Anbieter und wächst wöchentlich; Ahrefs und SE Ranking bauen es als Feature in bestehende Abos ein. Differenzierung nur über Sprache und Preis ist dünn.</dd>
+      <dt>24 Validierung</dt><dd>30 kostenlose Checks verschicken, Antwortquote und Rückfragen messen. Ab 5 Betrieben, die nach dem Preis fragen, ist es tragfähig.</dd>
+    </dl></div>
+  </details>
+
+  <details>
+    <summary>3 · KI-Telefonassistent für Solo-Betriebe <span class="pts">91 / 130</span></summary>
+    <div class="body"><dl>
+      <dt>1 Problem</dt><dd>Der Betrieb ist auf der Baustelle, das Telefon klingelt, niemand geht ran — der Kunde ruft den Nächsten an.</dd>
+      <dt>2 Zielgruppe</dt><dd>Ein- bis Fünf-Personen-Betriebe im Handwerk, kleine Praxen, Umzugs- und Reinigungsfirmen.</dd>
+      <dt>3 Problemstärke</dt><dd>Maximal. Direkt in Euro messbar.</dd>
+      <dt>4 Bestehende Lösungen</dt><dd>Telewa, Vokaro, Foncall, aaron.ai, RufLab, smao — plus jede Agentur, die Vapi oder Retell weiterverkauft.</dd>
+      <dt>5 Schwächen</dt><dd>Die meisten sind Wiederverkäufer derselben Bausteine, die Einrichtung ist beratungsintensiv, und die Preise (69–99 €/Monat mit Minutenkontingent) lassen wenig Raum nach unten.</dd>
+      <dt>6 Beweise</dt><dd>~35 % unbeantwortete Anrufe im Handwerk, 200–2.000 € Umsatz je verlorenem Auftrag, dokumentierte Fallzahlen (Erreichbarkeit von 62 auf 98 %, zwölf zusätzliche Aufträge im Monat).</dd>
+      <dt>7 Meine Lösung</dt><dd>Radikal enger Zuschnitt: nur Anrufannahme außerhalb der Erreichbarkeit, Name, Anliegen, Rückrufwunsch — als WhatsApp-Nachricht an den Chef. Keine Terminbuchung, keine Integration.</dd>
+      <dt>8 Killer Feature</dt><dd>Einrichtung in fünf Minuten ohne Telefonanlagen-Wissen: Rufumleitung einrichten, Branche wählen, fertig.</dd>
+      <dt>9 Weitere Features</dt><dd>Anruf-Zusammenfassung · Dringlichkeitserkennung · Rückrufliste · Notfall-Weiterleitung · Öffnungszeiten · Zweitsprache · Aufzeichnung mit Ansage · Wochenreport.</dd>
+      <dt>10 Monetarisierung</dt><dd>Abo mit Minutenkontingent.</dd>
+      <dt>11 Pricing</dt><dd>49 € (100 Min.) · 99 € (300 Min.) · 179 € (800 Min.).</dd>
+      <dt>12 Free vs. Premium</dt><dd>Kein Free-Tier, aber 14 Tage Test. Sprachminuten kosten echtes Geld.</dd>
+      <dt>13 Retention</dt><dd>Sehr hoch — läuft in der Telefonanlage und wird nicht angefasst.</dd>
+      <dt>14 Wettbewerbsvorteil</dt><dd>Einfachheit und Preis am unteren Ende.</dd>
+      <dt>15 MVP</dt><dd>Telefonnummer, Sprach-Agent mit Branchen-Prompt, Transkript per WhatsApp oder Mail, Weboberfläche mit Anrufliste.</dd>
+      <dt>16 Technik</dt><dd>Vapi oder Retell für Sprache, Twilio für Nummern, Next.js für die Oberfläche.</dd>
+      <dt>17 KI-Unterstützung</dt><dd>Sprachmodell für Gespräch und Zusammenfassung.</dd>
+      <dt>18 MVP-Kosten</dt><dd>~700 € — Sprachminuten im Test sind der teuerste Posten.</dd>
+      <dt>19 Laufende Kosten</dt><dd>0,05–0,12 €/Minute plus 1–2 €/Nummer/Monat. Bei 100 Kunden mit 200 Minuten: 1.000–2.400 €/Monat variable Kosten. Marge ~70 %.</dd>
+      <dt>20 Erste 100 Nutzer</dt><dd>Kaltakquise per Telefon und Vor-Ort-Besuch. <strong>Genau hier scheitert die Idee für dich.</strong></dd>
+      <dt>21 Skalierung</dt><dd>Über Handwerkskammern, Innungen und Fachpartner.</dd>
+      <dt>22 Risiken</dt><dd>Ein einziges peinliches KI-Gespräch mit einem Kunden kostet das Abo. Dazu DSGVO-Pflichten bei Aufzeichnung und ein Markt, in dem 2026 monatlich neue Anbieter starten.</dd>
+      <dt>23 Gegenargumente</dt><dd>Die beste Idee der Liste nach ROI — und die schlechteste nach Gründerpassung. Handwerksbetriebe kaufen von Menschen, denen sie vertrauen, und der Vertrieb läuft über das Telefon. Ein 13-Jähriger kommt an dieser Hürde nicht vorbei, egal wie gut das Produkt ist.</dd>
+      <dt>24 Validierung</dt><dd>20 Betriebe anrufen und fragen, wie viele Anrufe sie täglich verpassen. Wenn du das nicht durchziehen kannst, ist das bereits die Antwort.</dd>
+    </dl></div>
+  </details>
+
+  <details>
+    <summary>4 · Bewertungs-Autopilot für lokale Betriebe <span class="pts">91 / 130</span></summary>
+    <div class="body"><dl>
+      <dt>1 Problem</dt><dd>Lokale Betriebe brauchen 20–30 Bewertungen über 4,5 Sternen, um in Google Maps sichtbar zu sein — und sammeln keine.</dd>
+      <dt>2 Zielgruppe</dt><dd>Restaurants, Salons, Werkstätten, Praxen, Handwerk.</dd>
+      <dt>3 Problemstärke</dt><dd>Mittel bis hoch, direkt sichtbar im Ranking.</dd>
+      <dt>4 Bestehende Lösungen</dt><dd>Flowmatiq (ab 49 €/Monat), RO App, gmbapi, 99flow, dazu Bewertungsfunktionen in jeder Kassen- und Buchungssoftware.</dd>
+      <dt>5 Schwächen</dt><dd>Feature-Bündel statt Fokus, oft englischsprachig oder auf Agenturen zugeschnitten.</dd>
+      <dt>6 Beweise</dt><dd>Ohne Automatisierung kostet Bewertungssammeln ca. 15 Minuten pro Kunde; Google-Rezensionen beeinflussen 93 % der Kaufentscheidungen.</dd>
+      <dt>7 Meine Lösung</dt><dd>QR-Karte und SMS/WhatsApp-Anfrage nach Auftragsende, Erinnerung nach 3 Tagen, KI-Antwortvorschläge auf jede neue Bewertung, Alarm bei 1–2 Sternen.</dd>
+      <dt>8 Killer Feature</dt><dd>Negativ-Abfangen: unzufriedene Kunden landen in einem internen Formular statt bei Google.</dd>
+      <dt>9 Weitere Features</dt><dd>QR-Aufsteller-Druckvorlage · Team-Wettbewerb · Bewertungs-Widget für die Website · Verlauf · Wettbewerbsvergleich im Umkreis · Mehrsprachigkeit.</dd>
+      <dt>10–12 Geld</dt><dd>39 €/Monat einzeln, 89 € für Ketten mit mehreren Standorten. Kein Free-Tier, 14 Tage Test.</dd>
+      <dt>13 Retention</dt><dd>Hoch, solange Bewertungen eingehen.</dd>
+      <dt>14 Vorteil</dt><dd>Ein Zweck, deutsche Oberfläche, Preis unter den Bündeln.</dd>
+      <dt>15 MVP</dt><dd>Google-Business-Anbindung, Anfrage-Versand, KI-Antwortentwurf, Dashboard.</dd>
+      <dt>16–17 Technik</dt><dd>Google Business Profile API, Twilio, Claude für Antworten, Next.js.</dd>
+      <dt>18–19 Kosten</dt><dd>~300 € MVP, ~50 € Infrastruktur plus SMS-Kosten.</dd>
+      <dt>20–21 Wachstum</dt><dd>Kaltakquise per Mail an Betriebe mit wenigen Bewertungen — die Zielliste erzeugt sich automatisch aus Google Maps.</dd>
+      <dt>22–23 Risiken</dt><dd>Google ändert Richtlinien zum Sammeln von Bewertungen; das Negativ-Abfangen bewegt sich in einer Grauzone und kann als Bewertungsmanipulation ausgelegt werden. Außerdem: sehr viele Anbieter.</dd>
+      <dt>24 Validierung</dt><dd>50 Betriebe mit weniger als 15 Bewertungen anschreiben, kostenlosen Testmonat anbieten.</dd>
+    </dl></div>
+  </details>
+
+  <details>
+    <summary>5 · Angebots-Nachfassen für Handwerk und Dienstleister <span class="pts">90 / 130</span></summary>
+    <div class="body"><dl>
+      <dt>1–3 Problem</dt><dd>Angebote werden verschickt und nie nachgefasst. Betriebe verlieren Aufträge, weil der Kunde in der Zwischenzeit bei der Konkurrenz unterschreibt — belegt durch ZDH-Umfragen zur Angebotsgeschwindigkeit. Häufigkeit: wöchentlich.</dd>
+      <dt>4–5 Konkurrenz</dt><dd>In jeder großen Handwerkersoftware als vergrabenes Feature vorhanden (Plancraft, ToolTime, Meisterwerk), als eigenständiges deutsches Werkzeug praktisch nicht.</dd>
+      <dt>6 Beweise</dt><dd>Angebotsmeister und ähnliche Anbieter haben die <em>Erstellung</em> per Sprachnachricht bereits gelöst — die Lücke liegt danach, beim Nachfassen.</dd>
+      <dt>7–8 Lösung</dt><dd>Angebots-PDF hochladen, Kunde bekommt einen Link statt eines Anhangs. Der Betrieb sieht, wann es geöffnet wurde, und das System fragt nach 3, 7 und 14 Tagen freundlich nach. Killer Feature: die Lesebestätigung.</dd>
+      <dt>9 Weitere Features</dt><dd>Zusagen-Button · Terminvorschlag · Erinnerung an eigene Rückrufe · Statistik zur Abschlussquote · Textbausteine.</dd>
+      <dt>10–12 Geld</dt><dd>19 € Solo, 39 € Team. Kostenlos bis 3 Angebote im Monat.</dd>
+      <dt>13–14 Bindung</dt><dd>Mittel. Es ist ein Feature, kein System of Record — das ist die Schwäche.</dd>
+      <dt>15–19 Bau</dt><dd>Sehr klein: PDF-Upload, Link-Tracking, Mail-Sequenz. ~200 € MVP, ~25 €/Monat laufend.</dd>
+      <dt>20–21 Wachstum</dt><dd>Handwerker-Facebook-Gruppen, YouTube, Kooperation mit Angebotssoftware als Ergänzung.</dd>
+      <dt>22–23 Risiken</dt><dd>Zu klein für ein eigenes Abo — der wahrscheinlichste Ausgang ist, dass es ein nettes Werkzeug bleibt, das niemand bezahlt. Und die großen Anbieter können es an einem Nachmittag nachbauen.</dd>
+      <dt>24 Validierung</dt><dd>In 3 Handwerker-Gruppen fragen: „Fasst ihr Angebote nach? Womit?“ Wenn die Antwort „gar nicht“ lautet und trotzdem niemand zahlen will, ist die Idee tot.</dd>
+    </dl></div>
+  </details>
+
+  <details>
+    <summary>6 · CRM für Hochzeits- und Event-Dienstleister <span class="pts">88 / 130</span></summary>
+    <div class="body"><dl>
+      <dt>1–3 Problem</dt><dd>Anfragen kommen per Instagram-DM, Angebote per Word, Verträge per Post, Anzahlungen gar nicht. Bei 20–40 Hochzeiten im Jahr und je 1.500–4.000 € Auftragswert ist jeder verlorene Faden teuer.</dd>
+      <dt>4–5 Konkurrenz</dt><dd>HoneyBook und Studio Ninja sind US-Produkte ohne saubere DSGVO- und SEPA-Basis; Fotografen.Management deckt Fotografen in Deutschland ab. Für DJs, Trauredner, Floristik, Catering und Videografen gibt es kaum etwas.</dd>
+      <dt>6 Beweise</dt><dd>Der DSGVO-Punkt wird in deutschen Vergleichen ausdrücklich als Vorteil deutscher Anbieter genannt — Serverstandort und AV-Vertrag sind Kaufargumente.</dd>
+      <dt>7–8 Lösung</dt><dd>Anfrageformular für die Instagram-Bio, Verfügbarkeitskalender, Angebot mit einem Klick, digitale Unterschrift, automatische Anzahlungsrechnung. Killer Feature: von der DM zur unterschriebenen Anzahlung in unter fünf Minuten.</dd>
+      <dt>9 Weitere Features</dt><dd>Ablaufplan für den Veranstaltungstag · Fragebogen ans Brautpaar · Restzahlungs-Erinnerung · Kollegen-Empfehlungen · Reisekostenrechner · Steuer-Export.</dd>
+      <dt>10–12 Geld</dt><dd>29 € Solo, 59 € Team. Saisonpause-Tarif im Winter — ein starkes Argument in dieser Branche.</dd>
+      <dt>13–14 Bindung</dt><dd>Hoch: Kundenhistorie und Verträge liegen drin. Buchungen laufen 12–18 Monate im Voraus, damit ist der Kalender gefüllt und der Wechsel unattraktiv.</dd>
+      <dt>15–19 Bau</dt><dd>Formular, Kalender, Angebot, E-Signatur, Stripe. ~400 € MVP, ~50 €/Monat laufend.</dd>
+      <dt>20–21 Wachstum</dt><dd>Instagram — die Zielgruppe lebt dort und ist per DM erreichbar. Danach Hochzeitsmessen und Verbandsgruppen.</dd>
+      <dt>22–23 Risiken</dt><dd>Kleiner Markt: Für 10.000 € brauchst du ~250 Kunden bei 40 € Durchschnitt, aus einer Gesamtzielgruppe von vielleicht 30.000 Betrieben in DACH. Das ist ein Marktanteil von fast 1 % — machbar, aber ohne Puffer. Stark saisonal.</dd>
+      <dt>24 Validierung</dt><dd>30 Hochzeits-DJs und Videografen per Instagram-DM fragen, wie sie Anfragen verwalten.</dd>
+    </dl></div>
+  </details>
+
+  <details>
+    <summary>7 · Kurs- und Terminverwaltung für Solo-Anbieter <span class="pts">87 / 130</span></summary>
+    <div class="body"><dl>
+      <dt>1–3 Problem</dt><dd>„Termine per WhatsApp, Zehnerkarten auf Pappkärtchen, Rechnungen von Hand“ — Teilnehmer können sich nicht selbst an- und abmelden, alles läuft über den Anbieter. Dazu geteilte Google Sheets mit Teilnehmerdaten, was datenschutzrechtlich problematisch ist.</dd>
+      <dt>4–5 Konkurrenz</dt><dd>kutego, kursifant, Stampal, SPORTMEO — viele kleine, günstige Anbieter. Der Markt ist nicht leer, sondern zersplittert.</dd>
+      <dt>6 Beweise</dt><dd>Wörtliche Beschreibungen des Ist-Zustands in Branchenblogs für Hundeschulen und Kursanbieter.</dd>
+      <dt>7–8 Lösung</dt><dd>Ein Link, den der Anbieter in seine Instagram-Bio setzt: Kurse, freie Plätze, Selbstbuchung, Zehnerkarte digital. Killer Feature: die digitale Zehnerkarte mit automatischem Abbuchen pro Termin.</dd>
+      <dt>9 Weitere Features</dt><dd>Warteliste · Absageregel mit Frist · Sammelrechnung · SEPA-Lastschrift · Teilnehmerprofile · Erinnerungen · Kursreihen.</dd>
+      <dt>10–12 Geld</dt><dd>19 € Basis, 39 € mit Zahlungen. Kostenlos bis 15 Teilnehmer.</dd>
+      <dt>13–14 Bindung</dt><dd>Sehr hoch — Kundendaten und Guthaben liegen im System.</dd>
+      <dt>15–19 Bau</dt><dd>Kalender, Buchung, Guthabenkonto, Stripe/SEPA. ~350 € MVP.</dd>
+      <dt>20–21 Wachstum</dt><dd>Instagram-DM an Hundeschulen und Yogastudios, sichtbare Buchungsseite als Werbung bei jedem Teilnehmer.</dd>
+      <dt>22–23 Risiken</dt><dd>Zu viele gleichartige Anbieter, alle günstig. Differenzierung praktisch nur über Bedienung — schwer zu verteidigen. Und die Zielgruppe ist beratungsintensiv beim Umstieg.</dd>
+      <dt>24 Validierung</dt><dd>20 Hundeschulen per Instagram fragen, wie sie Zehnerkarten verwalten.</dd>
+    </dl></div>
+  </details>
+
+  <details>
+    <summary>8 · Recruiting-Funnel für kleine Handwerksbetriebe <span class="pts">85 / 130</span></summary>
+    <div class="body"><dl>
+      <dt>1–3 Problem</dt><dd>Fachkräftemangel ist das teuerste Problem im Handwerk. Spezialisierte Agenturen verlangen 1.000–3.000 € im Monat.</dd>
+      <dt>4–5 Konkurrenz</dt><dd>Recruiting-Agenturen fürs Handwerk, Workwise, softgarden, onlyfy. Teuer oder auf größere Betriebe zugeschnitten.</dd>
+      <dt>6 Beweise</dt><dd>Die Existenz einer ganzen Agenturbranche zu diesem Preis ist der Zahlungsbeleg.</dd>
+      <dt>7–8 Lösung</dt><dd>Stellenanzeige per KI aus drei Sätzen, Bewerbung ohne Lebenslauf über drei Fragen auf dem Handy, Benachrichtigung per WhatsApp. Killer Feature: Bewerbung in 90 Sekunden ohne Anschreiben.</dd>
+      <dt>9 Weitere Features</dt><dd>Anzeigen-Vorlagen je Gewerk · Meta-Anzeigen-Assistent · Bewerber-Pipeline · automatische Absagen · Terminvorschläge · Ausbildungsplatz-Modus.</dd>
+      <dt>10–12 Geld</dt><dd>99 €/Monat oder 299 € je Stellenbesetzung.</dd>
+      <dt>13–14 Bindung</dt><dd>Niedrig bis mittel — nach der Einstellung wird gekündigt. Das ist die zentrale Schwäche.</dd>
+      <dt>15–19 Bau</dt><dd>Anzeigen-Generator, mobile Bewerbungsstrecke, Pipeline. ~450 € MVP.</dd>
+      <dt>20–21 Wachstum</dt><dd>Kaltakquise, Innungen. Zusätzlich braucht der Kunde ein Werbebudget — zusätzliche Hürde.</dd>
+      <dt>22–23 Risiken</dt><dd>Erfolgsabhängige Erwartung: Wenn keine Bewerbung kommt, ist es die Schuld der Software. Sehr hoher Erklärungsbedarf.</dd>
+      <dt>24 Validierung</dt><dd>15 Betriebe fragen, was sie zuletzt für Personalsuche ausgegeben haben.</dd>
+    </dl></div>
+  </details>
+
+  <details>
+    <summary>9 · Minimal-Zeiterfassung für Betriebe unter 10 Mitarbeitern <span class="pts">85 / 130</span></summary>
+    <div class="body"><dl>
+      <dt>1–3 Problem</dt><dd>Dokumentationspflicht besteht, elektronische Pflicht für Kleinstbetriebe (noch) nicht — aber Zettelwirtschaft ist fehleranfällig und im Außendienst unpraktisch. Anträge auf Befreiung vom elektronischen Verfahren sind nur noch bis Ende 2026 möglich.</dd>
+      <dt>4–5 Konkurrenz</dt><dd>Clockodo, Papershift, TimeTac, ZEP, Ordio, aplano, Personio. Extrem besetzt, teils mit kostenlosen Tarifen.</dd>
+      <dt>6 Beweise</dt><dd>Deutliche Fristen und Bußgeldandrohungen in der Fachpresse — aber auch ein Markt, der seit Jahren bedient wird.</dd>
+      <dt>7–8 Lösung</dt><dd>Ein Knopf auf dem Handy, kein Login für Mitarbeiter, monatlicher PDF-Nachweis. Killer Feature: Mitarbeiter braucht kein Konto — nur einen persönlichen Link.</dd>
+      <dt>9 Weitere Features</dt><dd>Pausenautomatik · Projektzuordnung · Urlaubsantrag · Überstundenkonto · Standortnachweis · Export.</dd>
+      <dt>10–12 Geld</dt><dd>5 € pro Mitarbeiter, mindestens 15 €/Monat.</dd>
+      <dt>13–14 Bindung</dt><dd>Sehr hoch — läuft täglich und wird zur Gewohnheit.</dd>
+      <dt>15–19 Bau</dt><dd>Sehr einfach. ~300 € MVP.</dd>
+      <dt>20–21 Wachstum</dt><dd>SEO auf „Zeiterfassung Pflicht Kleinbetrieb“, danach Kaltakquise.</dd>
+      <dt>22–23 Risiken</dt><dd>Der Markt ist derart voll und die Basisfunktion so austauschbar, dass Preis das einzige Argument bleibt. Der niedrigste Konkurrenz-Score der gesamten Liste (2/10).</dd>
+      <dt>24 Validierung</dt><dd>Schwer positiv zu validieren — die Konkurrenz ist bereits der Beweis, dass der Markt bedient ist.</dd>
+    </dl></div>
+  </details>
+
+  <details>
+    <summary>10 · E-Rechnungs-Postfach und GoBD-Archiv für Kleinstunternehmer <span class="pts">82 / 130</span></summary>
+    <div class="body"><dl>
+      <dt>1–3 Problem</dt><dd>Seit dem 1.1.2025 muss jedes Unternehmen E-Rechnungen empfangen können — auch Kleinunternehmer, die selbst weiterhin PDFs schicken dürfen. Viele bekommen XML-Dateien, die sie weder lesen noch revisionssicher ablegen.</dd>
+      <dt>4–5 Konkurrenz</dt><dd>lexoffice, sevdesk, easybill, FastBill, Finom — dazu kostenlose Viewer. Die Funktion ist überall enthalten.</dd>
+      <dt>6 Beweise</dt><dd>Eine ZDH-Umfrage unter 1.926 Handwerksbetrieben Anfang 2026 zeigt, dass Senden und Empfangen von E-Rechnungen noch nicht rund läuft.</dd>
+      <dt>7–8 Lösung</dt><dd>Eine Mailadresse, an die alle Rechnungen weitergeleitet werden; alles wird lesbar dargestellt, geprüft und GoBD-konform archiviert. Killer Feature: null Einrichtung — nur weiterleiten.</dd>
+      <dt>9 Weitere Features</dt><dd>Fälligkeits-Erinnerung · Zahlungsabgleich · Steuerberater-Freigabe · Belegsuche · Jahresarchiv-Export.</dd>
+      <dt>10–12 Geld</dt><dd>7,90 €/Monat. Sehr niedriger ARPU.</dd>
+      <dt>13–14 Bindung</dt><dd>Hoch, aber der Preis trägt das Geschäft nicht: 10.000 € bräuchten ~1.270 Kunden.</dd>
+      <dt>15–19 Bau</dt><dd>Mail-Eingang, XML-Parser für XRechnung und ZUGFeRD, Archiv. ~250 € MVP.</dd>
+      <dt>20–21 Wachstum</dt><dd>SEO auf „XRechnung öffnen“ — hohes Suchvolumen, aber Suchende wollen meist ein kostenloses Werkzeug.</dd>
+      <dt>22–23 Risiken</dt><dd>Wird von Buchhaltungssoftware kostenlos mitgeliefert. Ein Feature, das sich als Produkt verkleidet.</dd>
+      <dt>24 Validierung</dt><dd>Kostenlosen Viewer bauen, Nutzungszahlen messen, dann Archiv-Funktion kostenpflichtig testen.</dd>
+    </dl></div>
+  </details>
+</section>
+
+<section id="p4">
+  <div class="phase-head"><span class="phase-num">Phase 4</span><h2>Was jede Idee vom 2.000-€-Budget frisst</h2></div>
+  <p>Realistisch kalkuliert für <em>deine</em> Situation: Entwicklung machst du selbst, deshalb steht dort nur, was du an Werkzeugen zahlst. Preise in Euro, für die ersten drei Monate.</p>
+
+  <div class="scroll wide">
+    <table>
+      <thead><tr><th>Idee</th><th class="num">Entwicklung</th><th class="num">KI-Tools</th><th class="num">APIs</th><th class="num">Hosting</th><th class="num">Design</th><th class="num">Stores</th><th class="num">Marketing</th><th class="num">Tests</th><th class="num">Sonstiges</th><th class="num">Gesamt</th></tr></thead>
+      <tbody>
+        <tr><td class="name">1 Flohwerk</td><td class="num">0</td><td class="num">60</td><td class="num">90</td><td class="num">80</td><td class="num">0</td><td class="num">0</td><td class="num">100</td><td class="num">60</td><td class="num">60</td><td class="num"><strong>450</strong></td></tr>
+        <tr><td class="name">2 KI-Sichtbarkeit</td><td class="num">0</td><td class="num">60</td><td class="num">80</td><td class="num">50</td><td class="num">0</td><td class="num">0</td><td class="num">60</td><td class="num">20</td><td class="num">30</td><td class="num"><strong>300</strong></td></tr>
+        <tr><td class="name">3 Telefonassistent</td><td class="num">0</td><td class="num">60</td><td class="num">300</td><td class="num">50</td><td class="num">0</td><td class="num">0</td><td class="num">150</td><td class="num">80</td><td class="num">60</td><td class="num"><strong>700</strong></td></tr>
+        <tr><td class="name">4 Bewertungen</td><td class="num">0</td><td class="num">60</td><td class="num">80</td><td class="num">50</td><td class="num">0</td><td class="num">0</td><td class="num">60</td><td class="num">20</td><td class="num">30</td><td class="num"><strong>300</strong></td></tr>
+        <tr><td class="name">5 Angebots-Nachfassen</td><td class="num">0</td><td class="num">40</td><td class="num">30</td><td class="num">40</td><td class="num">0</td><td class="num">0</td><td class="num">50</td><td class="num">10</td><td class="num">30</td><td class="num"><strong>200</strong></td></tr>
+        <tr><td class="name">6 Event-CRM</td><td class="num">0</td><td class="num">60</td><td class="num">70</td><td class="num">60</td><td class="num">0</td><td class="num">0</td><td class="num">100</td><td class="num">50</td><td class="num">60</td><td class="num"><strong>400</strong></td></tr>
+        <tr><td class="name">7 Kursverwaltung</td><td class="num">0</td><td class="num">40</td><td class="num">60</td><td class="num">60</td><td class="num">0</td><td class="num">0</td><td class="num">90</td><td class="num">40</td><td class="num">60</td><td class="num"><strong>350</strong></td></tr>
+        <tr><td class="name">8 Recruiting</td><td class="num">0</td><td class="num">60</td><td class="num">60</td><td class="num">50</td><td class="num">0</td><td class="num">0</td><td class="num">200</td><td class="num">40</td><td class="num">40</td><td class="num"><strong>450</strong></td></tr>
+        <tr><td class="name">9 Zeiterfassung</td><td class="num">0</td><td class="num">40</td><td class="num">40</td><td class="num">50</td><td class="num">0</td><td class="num">0</td><td class="num">100</td><td class="num">30</td><td class="num">40</td><td class="num"><strong>300</strong></td></tr>
+        <tr><td class="name">10 E-Rechnung</td><td class="num">0</td><td class="num">40</td><td class="num">30</td><td class="num">50</td><td class="num">0</td><td class="num">0</td><td class="num">80</td><td class="num">20</td><td class="num">30</td><td class="num"><strong>250</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="foot" style="margin-top:12px">Design steht bei allen auf 0 €: Tailwind plus eine kostenlose Komponentenbibliothek reicht vollkommen, und ein gekauftes Logo verbessert null Kennzahlen. App-Store-Gebühren stehen auf 0 €, weil alle zehn Ideen als Web-App starten sollten — 99 $/Jahr für Apple lohnen sich erst, wenn zahlende Kunden es verlangen.</p>
+
+  <h3>Der Budgetverlauf für den Gewinner</h3>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Meilenstein</th><th class="num">Kosten</th><th class="num">Verbleibendes Budget</th></tr></thead>
+      <tbody>
+        <tr><td>Validierung (Landingpage, Domain, Vorbestellungen)</td><td class="num">80 €</td><td class="num">1.920 €</td></tr>
+        <tr><td>Bis zum lauffähigen MVP</td><td class="num">220 €</td><td class="num">1.700 €</td></tr>
+        <tr><td>Bis zum ersten zahlenden Kunden</td><td class="num">310 €</td><td class="num">1.690 €</td></tr>
+        <tr><td>Erste 3 Monate gesamt</td><td class="num">450 €</td><td class="num">1.550 €</td></tr>
+        <tr class="total"><td>Laufende Kosten ab Monat 4 (bei ~100 Kunden)</td><td class="num">60–110 € / Monat</td><td class="num">reicht für 14+ Monate</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:12px"><strong>Was du weglassen kannst:</strong> Logo-Design, bezahlte Werbung im ersten halben Jahr, native Apps, eine Firmen-GmbH, kostenpflichtige No-Code-Baukästen (Bubble kostet mehr als Vercel plus Supabase zusammen) und jedes Werkzeug mit „Enterprise“ im Namen. <strong>Was du nicht sparen solltest:</strong> 60 € für Nutzer-Interviews — Gutscheine oder kleine Dankeschöns für Leute, die dir 20 Minuten ihrer Zeit geben. Das ist die günstigste Versicherung gegen ein Produkt, das niemand will.</p>
+</section>
+
+<section id="p5">
+  <div class="phase-head"><span class="phase-num">Phase 5</span><h2>Die Top 3, tief gerechnet</h2></div>
+
+  <h3>Platz 1 — Flohwerk</h3>
+  <div class="grid2">
+    <div class="note"><span class="label">Markt</span><p style="margin:0">Second-Hand DACH, 8,7 Mrd. € in Deutschland 2026, +22 % Wachstum. Zielgruppe: geschätzt 80.000–150.000 Verkäufer in DACH mit genug Volumen, dass Excel wehtut — abgeleitet aus 45.000 Vinted-Pro-Konten plus gewerblichen eBay- und Kleinanzeigen-Verkäufern plus Whatnot.</p></div>
+    <div class="note"><span class="label">Problem</span><p style="margin:0">Es existiert, weil die Plattformen bewusst geschlossen sind: keine gemeinsame Sicht, keine gemeinsame Zahl. Tritt täglich auf. Kostet 30–60 Minuten pro Tag plus unbekannt viel Marge durch falsch kalkulierte Preise.</p></div>
+    <div class="note"><span class="label">Lösung</span><p style="margin:0">Ein Artikel, ein Datensatz, alle Plattformen. Besser als bestehende Lösungen, weil sie entweder nur Text erzeugen oder nur Neuware-ERP sind.</p></div>
+    <div class="note"><span class="label">Monetarisierung</span><p style="margin:0">Abo 12,99 / 29 / 59 €. Upsells: Steuer-Export-Paket, Team-Plätze, später eine Umsatzbeteiligung über Versanddienstleister-Partnerschaften.</p></div>
+  </div>
+
+  <h4>Umsatzszenarien</h4>
+  <p class="foot">Wichtig: „1.000 Nutzer“ ist nicht „1.000 Zahler“. Bei Freemium konvertieren typischerweise 8–15 %. Beide Rechnungen stehen deshalb nebeneinander.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Szenario</th><th>Annahme</th><th class="num">Zahlende</th><th class="num">Ø Preis</th><th class="num">Monatsumsatz</th></tr></thead>
+      <tbody>
+        <tr><td>A — optimistisch</td><td>1.000 zahlende Nutzer</td><td class="num">1.000</td><td class="num">24 €</td><td class="num"><strong>24.000 €</strong></td></tr>
+        <tr><td>A — realistisch</td><td>1.000 registriert, 12 % zahlen</td><td class="num">120</td><td class="num">24 €</td><td class="num">2.880 €</td></tr>
+        <tr><td>B</td><td>500 zahlende Nutzer</td><td class="num">500</td><td class="num">24 €</td><td class="num"><strong>12.000 €</strong></td></tr>
+        <tr><td>C</td><td>100 Händler-Tarife</td><td class="num">100</td><td class="num">59 €</td><td class="num">5.900 €</td></tr>
+        <tr class="total"><td>Zielmix</td><td>250 Solo · 200 Pro · 60 Händler</td><td class="num">510</td><td class="num">~24 €</td><td class="num">12.707 €</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Wie viele Kunden für welchen Umsatz</h4>
+  <div class="scroll">
+    <table>
+      <thead><tr><th class="num">Monatsumsatz</th><th class="num">bei Ø 12,99 €</th><th class="num">bei Ø 24 €</th><th class="num">bei Ø 40 €</th></tr></thead>
+      <tbody>
+        <tr><td class="num">1.000 €</td><td class="num">77</td><td class="num">42</td><td class="num">25</td></tr>
+        <tr><td class="num">3.000 €</td><td class="num">231</td><td class="num">125</td><td class="num">75</td></tr>
+        <tr><td class="num">5.000 €</td><td class="num">385</td><td class="num">209</td><td class="num">125</td></tr>
+        <tr class="total"><td class="num">10.000 €</td><td class="num">770</td><td class="num">417</td><td class="num">250</td></tr>
+        <tr><td class="num">20.000 €</td><td class="num">1.540</td><td class="num">834</td><td class="num">500</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:12px">Die Zahl, auf die es ankommt: <strong>417 zahlende Kunden bei 24 € Durchschnitt.</strong> Vendoo gewinnt im größeren US-Markt rund 250 pro Monat. 417 über zwei bis drei Jahre in DACH ist ambitioniert, aber keine Fantasie — und der Händler-Tarif senkt die Zahl auf 250, wenn der Produktmix stimmt.</p>
+
+  <h3>Platz 2 — Lokale KI-Sichtbarkeit</h3>
+  <div class="scroll">
+    <table>
+      <thead><tr><th class="num">Monatsumsatz</th><th class="num">Betriebe à 49 €</th><th class="num">Agenturen à 149 €</th><th class="num">Mix</th></tr></thead>
+      <tbody>
+        <tr><td class="num">1.000 €</td><td class="num">21</td><td class="num">7</td><td class="num">10 + 3</td></tr>
+        <tr><td class="num">5.000 €</td><td class="num">103</td><td class="num">34</td><td class="num">50 + 17</td></tr>
+        <tr class="total"><td class="num">10.000 €</td><td class="num">205</td><td class="num">68</td><td class="num">100 + 34</td></tr>
+        <tr><td class="num">20.000 €</td><td class="num">409</td><td class="num">135</td><td class="num">200 + 67</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:12px">Attraktiv, weil 68 Agenturkunden für 10.000 € reichen. Unattraktiv, weil du diese 68 Agenturen aktiv gewinnen musst und die Kategorie sich gerade mit Anbietern füllt.</p>
+
+  <h3>Platz 3 — KI-Telefonassistent</h3>
+  <div class="scroll">
+    <table>
+      <thead><tr><th class="num">Monatsumsatz</th><th class="num">Kunden à 99 €</th><th class="num">variable Kosten</th><th class="num">Deckungsbeitrag</th></tr></thead>
+      <tbody>
+        <tr><td class="num">1.000 €</td><td class="num">10</td><td class="num">~200 €</td><td class="num">800 €</td></tr>
+        <tr><td class="num">5.000 €</td><td class="num">51</td><td class="num">~1.000 €</td><td class="num">4.000 €</td></tr>
+        <tr class="total"><td class="num">10.000 €</td><td class="num">101</td><td class="num">~2.000 €</td><td class="num">8.000 €</td></tr>
+        <tr><td class="num">20.000 €</td><td class="num">202</td><td class="num">~4.000 €</td><td class="num">16.000 €</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:12px">Die beste Rechnung der drei — nur 101 Kunden für 10.000 €. Und trotzdem Platz 3, weil diese 101 Kunden über Telefonakquise gewonnen werden müssen.</p>
+</section>
+
+<section id="p6">
+  <div class="phase-head"><span class="phase-num">Phase 6</span><h2>Elf harte Fragen, drei ehrliche Antworten</h2></div>
+  <div class="scroll wide">
+    <table>
+      <thead><tr><th>Frage</th><th>Flohwerk</th><th>KI-Sichtbarkeit</th><th>Telefonassistent</th></tr></thead>
+      <tbody>
+        <tr><td>1 Echtes Problem?</td><td>Ja — täglich, in Euro messbar</td><td>Ja, aber selten bewusst</td><td>Ja, am stärksten von allen</td></tr>
+        <tr><td>2 Genug Menschen?</td><td>Ja — 45.000 Vinted-Pro allein, wachsend</td><td>Ja — Millionen KMU</td><td>Ja — ~1 Mio. Handwerksbetriebe</td></tr>
+        <tr><td>3 Zahlungsbereit?</td><td>Belegt: Vendoo &gt;20.000 Abos</td><td>Belegt: SEO ab 500 €/Monat</td><td>Belegt: 69–99 €/Monat marktüblich</td></tr>
+        <tr><td>4 Konkurrenz vorhanden?</td><td>Ja, aber fragmentiert</td><td>Ja, sehr viel</td><td>Ja, wöchentlich mehr</td></tr>
+        <tr><td>5 Warum reicht sie nicht?</td><td>Kein DACH-Anbieter verbindet Bestand + Gewinn</td><td>Zu teuer, zu englisch, nicht lokal</td><td>Reicht eigentlich — nur der Preis differenziert</td></tr>
+        <tr><td>6 Differenzierbar?</td><td>Ja — Kleinanzeigen-first + Gewinnrechnung</td><td>Schwach — nur Sprache und Preis</td><td>Schwach</td></tr>
+        <tr><td>7 MVP unter 2.000 €?</td><td>Ja, ~450 €</td><td>Ja, ~300 €</td><td>Knapp, ~700 €</td></tr>
+        <tr><td>8 Erste Nutzer ohne Budget?</td><td><strong>Ja — Community + Affiliates</strong></td><td>Teilweise — Kaltakquise per Mail</td><td><strong>Nein — Telefonakquise</strong></td></tr>
+        <tr><td>9 Regelmäßige Nutzung?</td><td>Täglich</td><td>Monatlich</td><td>Passiv, im Hintergrund</td></tr>
+        <tr><td>10 Abo realistisch?</td><td>Ja</td><td>Ja</td><td>Ja</td></tr>
+        <tr><td>11 10.000 €+ plausibel?</td><td>Ja, über 2–3 Jahre</td><td>Ja, aber mit Vertrieb</td><td>Ja, aber nicht für dich</td></tr>
+        <tr class="total"><td>Urteil</td><td><span class="flag go">Gewinner</span></td><td><span class="flag care">Plan B</span></td><td><span class="flag stop">Falscher Gründer</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:14px">Frage 8 entscheidet alles. Zwei der drei Ideen scheitern nicht am Markt und nicht am Produkt, sondern daran, dass ein 13-Jähriger sie nicht verkaufen kann. Das ist kein Nachteil, den man wegarbeitet — es ist eine Auswahlbedingung.</p>
+</section>
+
+<section id="p7">
+  <div class="winner">
+    <p class="kicker">🚨 High-Potential Gap</p>
+    <h2>Flohwerk — die Warenwirtschaft für Second-Hand-Profis</h2>
+    <p>Die Lücke liegt zwischen „zu leicht“ und „zu schwer“: KI-Listing-Tools erzeugen Text und vergessen dich danach; JTL und plentymarkets sind ERP-Systeme für Neuware, die auf Windows-Servern laufen und Kleinanzeigen, Vinted und Whatnot gar nicht kennen. Dazwischen sitzen zehntausende deutsche Verkäufer mit einer Excel-Tabelle, die nicht mehr trägt.</p>
+  </div>
+
+  <h3>Warum diese Idee gewinnt</h3>
+  <p>Nicht weil das Problem am größten ist — beim Telefonassistenten ist es größer. Sondern weil es die einzige der zehn Ideen ist, bei der <strong>alle</strong> Bedingungen gleichzeitig erfüllt sind: bewiesene Zahlungsbereitschaft, wachsender Markt, schwache Konkurrenz genau in DACH, MVP für 450 €, tägliche Nutzung, echte Wechselhürde — und ein Vertriebskanal, den ein 13-Jähriger besser bedienen kann als jeder Erwachsene.</p>
+
+  <h4>Wer dafür zahlt</h4>
+  <p>Der Verkäufer mit 200–2.000 Artikeln, der zwischen 500 und 10.000 € im Monat umsetzt. Für ihn sind 29 € pro Monat weniger als der Gewinn eines einzigen Artikels — und er hat gerade gemerkt, dass er nicht sagen kann, ob sein bester Monat auch sein profitabelster war.</p>
+
+  <h4>Warum die Konkurrenz nicht reicht</h4>
+  <p>Crosslist schließt EU-Bewohner aus. List Perfectly unterstützt offiziell nur US-Marktplätze. Die Listing-Generatoren speichern nichts. JTL läuft nur auf Windows und ist komplex einzurichten. Und Kleinanzeigen — mit 36 Millionen Nutzern die größte deutsche Plattform — wird von fast keinem international gebauten Werkzeug ernst genommen.</p>
+
+  <h4>Warum 2.000 € reichen</h4>
+  <p>Weil du den teuersten Posten selbst stellst. Du beherrschst Next.js, TypeScript, Tailwind, die Anthropic-SDK und Vercel-Deployments bereits — dein Bruchrechen-Projekt nutzt sogar schon Structured Outputs, also genau den Mechanismus, mit dem aus einem Foto ein strukturierter Artikeldatensatz wird. Es bleiben Infrastruktur (~45 €/Monat), API-Kosten (~30 €/Monat) und eine Domain.</p>
+
+  <h4>Wie daraus 10.000 € im Monat werden</h4>
+  <p>417 zahlende Kunden bei 24 € Durchschnittspreis. Oder 250, wenn der Händler-Tarif greift. Der Weg dorthin: Monat 1–3 die ersten 20 Kunden aus Discords und Gruppen, Monat 4–12 auf 100–150 über Affiliates mit Reseller-Creatorn, Jahr 2 über SEO und die DACH-Ausweitung auf 400+. Vendoos 250 Neukunden pro Monat im US-Markt zeigen, dass die Größenordnung existiert.</p>
+
+  <h4>Das größte Risiko</h4>
+  <p><strong>Plattformabhängigkeit.</strong> Kleinanzeigen untersagt aggressive Bots und sperrt Konten automatisiert, ohne Begründung. Wenn du ein Crossposting-Feature baust, das Konten deiner Kunden gefährdet, ist das Produkt in dem Moment tot, in dem der erste Nutzer gesperrt wird.</p>
+  <div class="note risk">
+    <h4>Die Konsequenz daraus, und sie ist nicht verhandelbar</h4>
+    <p>Version 1 automatisiert nichts. Sie erzeugt Texte, speichert Bestand und rechnet Gewinn. Für eBay nutzt du später die offizielle Sell-API — die ist erlaubt und kostenlos. Für Kleinanzeigen und Vinted gilt: eine Browser-Erweiterung darf Formulare <em>vorausfüllen</em>, der Mensch klickt. Kein Headless-Bot, keine Massenautomatik, keine Umgehung von Limits.</p>
+  </div>
+
+  <h4>Warum du trotzdem starten solltest</h4>
+  <p>Weil das Risiko genau die Funktion betrifft, die du <em>nicht</em> zuerst baust — und weil der Kern des Produkts, Bestand und Gewinn, von keiner Plattform abhängt. Selbst wenn Kleinanzeigen morgen jede Integration blockiert, bleibt eine Warenwirtschaft, die verkaufte Artikel verrechnet. Dieses Geschäft steht auf den Daten deiner Kunden, nicht auf der Gnade einer Plattform.</p>
+</section>
+
+<section id="p8">
+  <div class="phase-head"><span class="phase-num">Phase 8</span><h2>30 Tage: erst verkaufen, dann bauen</h2></div>
+  <p class="lede">Programmiert wird ab Tag 15. Vorher wird herausgefunden, ob es jemand will. Wenn die Validierung an Tag 14 scheitert, hast du 80 € und zwei Wochen verloren statt 450 € und drei Monaten.</p>
+
+  <h3>Tag 1–3 · Problem und Konkurrenz prüfen</h3>
+  <ul>
+    <li>Selbst 20 Artikel auf Kleinanzeigen und Vinted einstellen. Ohne eigene Erfahrung baust du blind.</li>
+    <li>Vendoo, Relistly, Vinta, Photo to Listing und JTL testen. Für jedes notieren: Was fehlt für den deutschen Markt?</li>
+    <li>Kleinanzeigen-Community, Reseller-Discords und Facebook-Gruppen durchlesen. 20 wörtliche Beschwerden sammeln und in eine Tabelle schreiben.</li>
+  </ul>
+
+  <h3>Tag 4–7 · Mit echten Verkäufern sprechen</h3>
+  <ul>
+    <li>15 Verkäufer per DM anschreiben. Kein Pitch, eine Frage: „Wie behältst du den Überblick, was wo online ist — und weißt du, was du an einem Artikel verdienst?“</li>
+    <li>Nach der Excel fragen und um einen Screenshot bitten. Diese Screenshots sind deine Produktspezifikation.</li>
+    <li>Preisfrage stellen: „Was würdest du für ein Werkzeug zahlen, das das übernimmt?“ Antworten wörtlich notieren, nicht interpretieren.</li>
+  </ul>
+
+  <h3>Tag 8–14 · Landingpage und echte Vorbestellungen</h3>
+  <ul>
+    <li>Eine Seite: Problem, drei Screenshots (erst einmal von Hand gestaltet, ohne funktionierende Software), drei Tarife, ein Knopf.</li>
+    <li>Der Knopf führt zu Stripe: 19 € Vorauszahlung für lebenslang 50 % Rabatt. <strong>Echtes Geld ist das einzige verlässliche Signal.</strong></li>
+    <li>In Gruppen, Discords und der Kleinanzeigen-Community teilen. Ein TikTok-Video: „Ich bin 13 und baue eine Software für Vinted-Verkäufer.“</li>
+    <li><strong>Abbruchkriterium:</strong> Unter 5 Vorbestellungen oder unter 50 Wartelisten-Eintragungen — Idee überdenken, nicht bauen.</li>
+  </ul>
+
+  <h3>Tag 15–21 · MVP</h3>
+  <ul>
+    <li>Artikel anlegen mit Fotos, KI erzeugt Titel, Beschreibung und Preisvorschlag.</li>
+    <li>Status je Plattform manuell setzbar. Verkauf erfassen mit Einkaufspreis, Gebühren, Versand.</li>
+    <li>Eine Übersicht: Gewinn pro Artikel und pro Monat. Ein CSV-Export.</li>
+    <li>Mehr nicht. Kein Crossposting, keine Erweiterung, keine App.</li>
+  </ul>
+
+  <h3>Tag 22–30 · Start mit den Vorbestellern</h3>
+  <ul>
+    <li>Die Vorbesteller bekommen als Erste Zugang und werden persönlich betreut. Jede Rückmeldung wird beantwortet.</li>
+    <li>Drei Reseller-Creator mit kostenlosem Zugang plus 20 % wiederkehrender Affiliate-Provision ansprechen.</li>
+    <li>Wöchentlich ein TikTok über den Aufbau. Der Gründungsweg ist der Inhalt.</li>
+    <li><strong>Ziel Tag 30:</strong> 10 zahlende Kunden und mindestens 3 Nutzer, die täglich Artikel anlegen.</li>
+  </ul>
+</section>
+
+<section id="p9">
+  <div class="phase-head"><span class="phase-num">Phase 9</span><h2>Tech-Stack</h2></div>
+  <p>Ausgewählt nach einem Kriterium: Du kannst das meiste davon schon, der Rest ist in einem Tag gelernt.</p>
+  <div class="scroll wide">
+    <table>
+      <thead><tr><th>Bereich</th><th>Werkzeug</th><th>Zweck</th><th class="num">Preis</th><th>Warum</th></tr></thead>
+      <tbody>
+        <tr><td>Frontend</td><td class="name">Next.js 15 + React 19 + Tailwind</td><td>Weboberfläche</td><td class="num">0 €</td><td>Nutzt du bereits im Bruchrechen-Projekt</td></tr>
+        <tr><td>Backend</td><td class="name">Next.js API Routes</td><td>Serverlogik</td><td class="num">0 €</td><td>Kein zweiter Dienst nötig</td></tr>
+        <tr><td>Datenbank</td><td class="name">Supabase (Postgres)</td><td>Artikel, Verkäufe, Nutzer</td><td class="num">0 → 25 €</td><td>Kostenlos bis ~500 MB, danach planbar</td></tr>
+        <tr><td>Auth</td><td class="name">Supabase Auth</td><td>Login</td><td class="num">0 €</td><td>Im Paket enthalten, kein Clerk nötig</td></tr>
+        <tr><td>Dateien</td><td class="name">Supabase Storage</td><td>Artikelfotos</td><td class="num">0 → 20 €</td><td>Bilder sind der größte Kostentreiber — früh komprimieren</td></tr>
+        <tr><td>Payment</td><td class="name">Stripe (Billing)</td><td>Abos, SEPA, Karten</td><td class="num">1,5 % + 0,25 €</td><td>Abo-Verwaltung fertig, deutsche Zahlarten</td></tr>
+        <tr><td>Hosting</td><td class="name">Vercel</td><td>Deployment</td><td class="num">0 → 20 €</td><td>Kennst du schon; Hobby-Tarif reicht am Anfang</td></tr>
+        <tr><td>KI</td><td class="name">Claude (Anthropic SDK)</td><td>Foto → Artikeldatensatz</td><td class="num">~20–50 €/Mon.</td><td>Structured Outputs nutzt du bereits</td></tr>
+        <tr><td>Modellwahl</td><td class="name">Haiku 4.5 für Massen, Opus 5 für Schwieriges</td><td>Kostensteuerung</td><td class="num">—</td><td>Dein Modellvergleichs-Skript zeigt genau, wo der Unterschied zählt</td></tr>
+        <tr><td>Marktplatz</td><td class="name">eBay Sell/Inventory API</td><td>Legale Anbindung</td><td class="num">0 €</td><td>Offiziell, kostenlos, erlaubt — anders als Scraping</td></tr>
+        <tr><td>Erweiterung</td><td class="name">WXT oder Plasmo</td><td>Formular-Vorausfüllung (später)</td><td class="num">0 €</td><td>Erst ab Version 2, mit Nutzer-Klick</td></tr>
+        <tr><td>Mail</td><td class="name">Resend</td><td>Erinnerungen, Reports</td><td class="num">0 → 20 €</td><td>3.000 Mails/Monat kostenlos</td></tr>
+        <tr><td>Analytics</td><td class="name">PostHog</td><td>Wer nutzt was</td><td class="num">0 €</td><td>Großzügiges Freikontingent, DSGVO-tauglich konfigurierbar</td></tr>
+        <tr><td>Fehler</td><td class="name">Sentry</td><td>Fehlertracking</td><td class="num">0 €</td><td>Du siehst Abstürze, bevor Kunden schreiben</td></tr>
+        <tr><td>Deployment</td><td class="name">Web zuerst, PWA später</td><td>Verteilung</td><td class="num">0 €</td><td>Spart 99 $/Jahr und die App-Store-Prüfung</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="foot" style="margin-top:12px">Summe im ersten Jahr bei 100 Kunden: rund 90 €/Monat. Bei 500 Kunden rund 250 €/Monat — und dann trägt sich das Ganze längst selbst.</p>
+</section>
+
+<section id="p10">
+  <div class="phase-head"><span class="phase-num">Phase 10</span><h2>Von 10 auf 1.000 Nutzer</h2></div>
+  <p>Nur Kanäle, die zu deutschen Second-Hand-Verkäufern passen. Nicht dabei: LinkedIn (falsche Zielgruppe), Product Hunt (falsches Land), bezahlte Werbung (falsches Budget).</p>
+
+  <h4>Die ersten 10 — von Hand</h4>
+  <p>Direktnachrichten an aktive Verkäufer, die du auf Vinted und Kleinanzeigen selbst findest: Wer 200+ Artikel online hat, ist deine Zielgruppe und sichtbar. Kein Pitch, sondern die Bitte um 15 Minuten. Jeder, der antwortet, bekommt lebenslangen Gratis-Zugang und wird als Mitgestalter behandelt.</p>
+
+  <h4>Auf 50 — Communities</h4>
+  <p>Kleinanzeigen-Community, deutsche Reselling-Discords, Facebook-Gruppen wie „Vinted Verkäufer Deutschland“. Regel: erst 20-mal helfen, dann einmal etwas zeigen. Wer als Verkäufer bekannt ist, darf über sein Werkzeug reden.</p>
+
+  <h4>Auf 100 — TikTok</h4>
+  <p>Zwei Formate. Erstens der Aufbau: „Tag 12 — ich baue eine Software für Vinted-Verkäufer, hier ist die erste Version.“ Zweitens echter Nutzen: „So rechnest du deinen Gewinn auf Vinted richtig aus (die meisten vergessen den Versand).“ Dein Alter ist hier kein Makel, sondern der Grund, warum ein Video weiterläuft. Hashtags, die bereits existieren: #resellingdeutschland, #vinteddeutschland.</p>
+
+  <h4>Auf 500 — Affiliates</h4>
+  <p>Der bewährte Kanal dieser Kategorie. Vendoo zahlt 15 % für sechs Monate; du zahlst 20 % dauerhaft und bist damit für jeden Reseller-Creator im deutschsprachigen Raum die attraktivere Empfehlung. Zehn Creator mit je 5.000 Followern bringen mehr als ein einziger mit 100.000.</p>
+
+  <h4>Auf 1.000 — SEO und Werkzeuge</h4>
+  <p>Kostenlose Rechner, die für sich selbst ranken: Vinted-Gebührenrechner, Versandkostenvergleich, DAC7-Schwellenrechner. Dazu Ratgeber zu „Kleinanzeigen Anzeige wiedereinstellen“, „Gewerblich verkaufen ab wann“, „Vinted Gewinn berechnen“. Diese Suchanfragen haben konstantes Volumen und kommen jedes Jahr wieder — und Suchmaschinen wie KI-Antworten greifen beide gern auf solche Rechner zurück.</p>
+
+  <div class="note" style="margin-top:20px">
+    <h4>Was du nicht tun solltest</h4>
+    <p style="margin:0">Keine bezahlten Anzeigen, bevor du weißt, was ein Kunde über seine Lebensdauer einbringt. Keine App-Store-Veröffentlichung vor 100 zahlenden Kunden. Und keine Funktionen bauen, weil ein einzelner Nutzer danach gefragt hat — erst ab drei unabhängigen Anfragen.</p>
+  </div>
+</section>
+
+<section id="quellen">
+  <div class="phase-head"><span class="phase-num">Belege</span><h2>Quellen &amp; Belege</h2></div>
+  <p class="foot">Getrennt nach Fakt und Einschätzung: Zahlen und Zitate stammen aus den verlinkten Quellen; alle Bewertungen, Scores, Preisvorschläge und Umsatzszenarien sind meine Einschätzung und keine Prognose. Stand: 15. August 2026.</p>
+
+  <h4>Second-Hand-Markt und Reselling</h4>
+  <ul class="src">
+    <li><a href="https://marszalstudio.pl/de/second-hand-markt-deutschland-2026/">Second-Hand-Markt Deutschland 2026</a> — 8,7 Mrd. €, +22 %; Kleinanzeigen 36 Mio. Nutzer; Vinted &gt;11 Mio. in DE</li>
+    <li><a href="https://marszalstudio.pl/de/vinted-pro-deutschland-2026-gewerblich-verkaufen/">Vinted Pro Deutschland 2026</a> — ~45.000 aktive Pro-Konten Q1 2026, Frankreich &gt;200.000</li>
+    <li><a href="https://www.vendoo.co/affiliate-program-1">Vendoo Affiliate-Programm</a> und <a href="https://www.shopper.com/partnerships/vendoo-co-affiliate-program">Programmdetails</a> — 15 % / 6 Monate, &gt;20.000 Abonnenten, ~250 Neukunden pro Monat</li>
+    <li><a href="https://tekpon.com/software/vendoo/pricing/">Vendoo-Preise</a> — 14,99 / 29,99 / 59,99 $; <a href="https://blog.vendoo.co/list-perfectly-pricing-how-much-does-this-crosslisting-app-cost">List Perfectly</a> — ab 29 $, bis 249 $</li>
+    <li><a href="https://relistly.io/guides/best-crosslisting-software-europe">Crosslisting in Europa</a> — Crosslist schließt EU-Bewohner aus, List Perfectly nur US-Marktplätze</li>
+    <li><a href="https://kleinanzeigen-community.de/t/crosslist-funktionen-fuer-ebay-kleinanzeigen-vinted-etc/2589">Kleinanzeigen-Community</a> — Nutzer fordern die Verbindung eBay / Kleinanzeigen / Vinted</li>
+    <li><a href="https://themen.kleinanzeigen.de/nutzungsbedingungen/">Kleinanzeigen-Nutzungsbedingungen</a> und <a href="https://www.heise.de/news/Vorsicht-Kunde-Kontosperre-bei-Kleinanzeigen-10437042.html">heise zur automatisierten Kontosperre</a></li>
+    <li><a href="https://www.absatzwirtschaft.de/live-shopping-auf-whatnot-willkommen-im-digitalen-rausch-279703/">Whatnot Deutschland</a> — deutsche Verkäufer europaweit am erfolgreichsten, 84 % bauen 2026 aus</li>
+    <li><a href="https://developer.ebay.com/api-docs/sell/inventory/static/overview.html">eBay Inventory API</a> — offizielle, kostenlose Anbindung</li>
+  </ul>
+
+  <h4>Handwerk, lokale Betriebe und KI-Sichtbarkeit</h4>
+  <ul class="src">
+    <li><a href="https://www.telewa.de/blog/erreichbarkeit-handwerk-verpasste-anrufe">Erreichbarkeit im Handwerk</a> — ~35 % unbeantwortete Anrufe, 200–2.000 € je verlorenem Auftrag</li>
+    <li><a href="https://openhandwerk.de/blog/warum-excel-und-whatsapp-im-handwerk-nicht-mehr-reichen-wie-integrierte-handwerkersoftware-ihren-betrieb-nach-vorne-bringt/">Excel und WhatsApp im Handwerk</a> — bis 15 % Umsatzverlust durch Medienbrüche</li>
+    <li><a href="https://handwerker-kosmos.de/handwerker-software/vergleich/">Handwerkersoftware-Vergleich</a> — Plancraft ab 59,90 €, ToolTime ab ~29 €/Nutzer, Preis für Kleinbetriebe zu hoch</li>
+    <li><a href="https://die-mainagentur.de/blog/lokale-ki-sichtbarkeit-chatgpt-empfehlung/">Lokale KI-Sichtbarkeit</a> — ChatGPT nennt nur 1–2 % der untersuchten Betriebe</li>
+    <li><a href="https://peec.ai/pricing-agencies">Peec AI Preise</a> — 85 / 205 / 425 €; <a href="https://indexly.ai/blog/profound-pricing/">Profound</a> — ab 99 $, real 2.000–5.000 $</li>
+    <li><a href="https://flowmatiq.eu/blog/google-bewertungen-automatisch-beantworten-ki/">Bewertungsmanagement</a> — ab 49 €/Monat, 15 Min. pro Kunde ohne Automatisierung</li>
+    <li><a href="https://angebots-meister.de/blog/beste-angebotssoftware-handwerk">Angebotssoftware Handwerk</a> — Sprachnachricht zu Angebot ist bereits gelöst</li>
+  </ul>
+
+  <h4>Regulatorik und Rahmenbedingungen</h4>
+  <ul class="src">
+    <li><a href="https://www.zdh.de/ueber-uns/fachbereich-steuern-und-finanzen/elektronische-rechnung/">ZDH zur E-Rechnung</a> — Umfrage unter 1.926 Betrieben, Umsetzung noch holprig</li>
+    <li><a href="https://www.hvhessen.de/nachrichten/20250820-erste-abmahnungen-wegen-angeblicher-verstoesse-gegen-das-bfsg.php">Erste BFSG-Abmahnungen</a> (August 2025) und <a href="https://www.e-recht24.de/ecommerce/13236-barrierefreiheitsstaerkungsgesetz.html">BFSG-Überblick</a></li>
+    <li><a href="https://skill-sprinters.de/ki-kompetenzpflicht-art-4/">EU-AI-Act Art. 4</a> — Marktüberwachung seit 2.8.2026, Schulungen 80–250 € pro Person</li>
+    <li><a href="https://get-sentra.com/blog/dac7-vinted-erklaert">DAC7 bei Vinted</a> — Meldung ab 30 Verkäufen oder 2.000 € je Plattform</li>
+    <li><a href="https://www.zeiterfassung-fdm.de/ressourcen/ratgeber/zeiterfassung-kleinbetriebe-pflicht/">Zeiterfassung Kleinbetriebe</a> — Befreiungsanträge nur noch bis Ende 2026</li>
+    <li><a href="https://www.existenzgruendungsportal.de/Redaktion/DE/BMWK-Infopool/Antworten/Gruendungsplanung/Studenten-Schueler/Minderjaehriger-gruendet-Unternehmen-Zustimmung-des-Familiengerichts">BMWK: Minderjähriger gründet</a> — § 112 BGB, Familiengericht</li>
+    <li><a href="https://www.iwkoeln.de/studien/andrea-hammermann-klaus-heiner-roehl-ein-tag-pro-woche-fuer-buerokratie.html">IW Köln: Bürokratie</a> — ~9 Stunden pro Woche bei jungen Unternehmen</li>
+  </ul>
+
+  <h4>Weitere Vertikalen (geprüft, nicht empfohlen)</h4>
+  <ul class="src">
+    <li><a href="https://kursifant.com/blog/kursverwaltung-excel-umstieg">Kursverwaltung mit Excel</a> — WhatsApp-Termine, Zehnerkarten auf Pappe, DSGVO-Problem bei Google Sheets</li>
+    <li><a href="https://wir-helfen-gemeinsam.de/beste-software-fuer-vereine-2026-was-lohnt-sich-wirklich/">Vereinssoftware 2026</a> — Excel-Listen und drei WhatsApp-Gruppen</li>
+    <li><a href="https://fahrschulcockpit.de/2026/06/30/fahrschulverwaltungssoftware-2027-worauf-fahrlehrer-jetzt-achten-sollten/">Fahrschulreform 2027</a> — neue Anforderungen an Verwaltungssoftware</li>
+    <li><a href="https://mietergenie.de/blog/nebenkostenabrechnung-fehler">Nebenkostenabrechnung</a> — ~50 % fehlerhaft, im Schnitt 565 € Widerspruchssumme</li>
+    <li><a href="https://www.softwareabc24.de/vergleiche/tooltime-vs-plancraft">Warenwirtschaft im Vergleich</a> und <a href="https://kosten.org/software/multichannel-erp">Multi-Channel-ERP</a> — JTL nur auf Windows-Servern, komplexe Einrichtung</li>
+    <li><a href="https://www.capterra.com.de/alternatives/162588/honeybook">HoneyBook-Alternativen</a> — DSGVO und Serverstandort als Kaufargument in DACH</li>
+  </ul>
+</section>
+
+<hr>
+
+<section>
+  <h2>Die entscheidende Frage</h2>
+  <p class="lede" style="margin-bottom:16px">„Welche eine App würde ich heute mit maximal 2.000 € bauen, wenn mein Ziel 10.000 €+ Monatsumsatz ist?“</p>
+  <p><strong>Flohwerk.</strong> Eine leichte Warenwirtschaft für semi-professionelle Second-Hand-Verkäufer in DACH: ein Artikel, ein Datensatz, alle Plattformen — mit dem echten Gewinn pro Artikel als Kernfunktion.</p>
+  <p>Nicht, weil das Problem das größte ist. Das größte Problem der ganzen Recherche sind die 35 % unbeantworteten Anrufe im Handwerk, und ein KI-Telefonassistent bräuchte nur 101 Kunden für 10.000 €. Aber diese 101 Kunden gewinnt man am Telefon, und das kannst du mit 13 nicht — nicht, weil du zu schlecht wärst, sondern weil der Kanal dir verschlossen ist.</p>
+  <p>Flohwerk gewinnt, weil es die einzige Idee ist, bei der der Vertriebskanal dein Heimspiel ist: Discords, TikTok, Reseller-Communities und Affiliate-Deals mit Creatorn. Es ist gleichzeitig der Kanal, über den der Marktführer in den USA über 20.000 Abonnenten aufgebaut hat. Du kannst dein eigener erster Kunde sein, du kennst die Sprache der Zielgruppe, und niemand wird dich nach deinem Alter fragen, bevor er ein 29-€-Abo abschließt.</p>
+  <p>Der Weg dahin: <strong>417 zahlende Kunden bei 24 € Durchschnittspreis.</strong> Das MVP kostet 450 €, du hast die technischen Grundlagen bereits, und an Tag 14 weißt du — bevor du eine Zeile Produktcode geschrieben hast — ob jemand dafür bezahlt.</p>
+  <p class="foot" style="margin-top:20px">Ein letzter Hinweis, der wichtiger ist als jede Zahl in diesem Dokument: Sprich diese Woche mit deinen Eltern über die Gewerbeanmeldung und das Stripe-Konto. Ohne diesen Schritt kannst du den ersten Euro nicht annehmen — und alles andere hier wäre umsonst.</p>
+</section>
+
+</div>
